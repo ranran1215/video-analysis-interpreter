@@ -1,0 +1,56 @@
+# Build outputs
+spring_boot/target/
+
+# Runtime data
+/.cache/
+/uploads/
+spring_boot/data/
+spring_boot/uploads/
+spring_boot/logs/
+
+# Local video materials
+/video/
+*.mp4
+*.mkv
+*.mov
+*.avi
+*.webm
+*.wav
+*.mp3
+*.m4a
+
+# Logs and temporary runtime files
+*.log
+*.err.log
+*.out.log
+*.trace.db
+*.pid
+*.tmp
+*.temp
+
+# Python cache
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Local secrets and environment overrides
+.env
+.env.*
+*.env
+cookies.txt
+*.cookies
+*.key
+*.pem
+application-local.yml
+spring_boot/src/main/resources/application-local.yml
+
+# Local handoff/package outputs
+/gpt_project_package/
+/gpt_project_package.zip
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+Thumbs.db
+.DS_Store
