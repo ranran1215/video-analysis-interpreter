@@ -23,21 +23,29 @@ https://pan.baidu.com/s/1F4iTpD45SocdkDt_hUX6KQ
 fqp8
 ```
 
-说明：Demo 视频文件较大，已通过 `.gitignore` 排除，不直接提交到 GitHub。
+说明：Demo 视频文件较大，已通过 `.gitignore` 排除，不直接提交到 GitHub。评审或客户运行时，可以下载该视频，也可以换成任意本地短视频/音频文件。
+
+## 快速开始
+
+以下命令默认在你克隆后的仓库目录执行。如果你的项目放在其他目录，只需要先进入自己的项目根目录：
+
+```powershell
+git clone https://github.com/ranran1215/video-analysis-interpreter.git
+cd video-analysis-interpreter
+```
 
 ## 推荐 Demo 路径
 
 MySQL 是可选持久化增强，不是 Demo 必需。比赛或交付演示建议走 H2 默认模式，并按“双模式”演示：
 
 ```powershell
-cd G:\视频分析
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 .\scripts\demo_check.ps1
 ```
 
 然后：
 
-- 打开 `test_frontend.html`，上传 `video/demo_english_30s.mp4`，演示高精度视频分析模式。
+- 打开 `test_frontend.html`，上传下载好的 Demo 视频或任意本地短视频，演示高精度视频分析模式。
 - 打开 `realtime_demo.html`，选择本地短视频或音频，演示准实时同传模式。
 
 完整步骤见 `docs/DEMO_GUIDE.md`，常见问题见 `docs/TROUBLESHOOTING.md`。
@@ -51,7 +59,7 @@ cd G:\视频分析
 ## 目录结构
 
 ```text
-G:\视频分析
+video-analysis-interpreter
 ├── spring_boot/                    # Spring Boot 后端
 │   ├── src/main/java/com/video/    # Controller/Service/Entity/Repository/DTO
 │   ├── src/main/resources/application.yml
@@ -75,7 +83,7 @@ G:\视频分析
 ├── realtime_demo.html              # 准实时同传 Demo 页面
 ├── DIFY_PROMPT.txt                 # Legacy Dify 工作流提示词示例
 ├── 链接上传功能指南.md
-└── video/                          # 本地测试视频素材，不提交 GitHub
+└── video/                          # 可选本地测试视频素材，不提交 GitHub
 ```
 
 ## 真实技术栈
@@ -96,7 +104,7 @@ G:\视频分析
 默认模式仍使用 H2 文件库，适合快速开发和 Demo 调试：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -113,7 +121,7 @@ $env:MYSQL_USERNAME="root"
 $env:MYSQL_PASSWORD="你的密码"
 $env:MYSQL_URL="jdbc:mysql://localhost:3306/video_analysis?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
 
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_mysql.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -180,7 +188,7 @@ $env:REALTIME_FINALIZE_WINDOW_MS="15000"
 只检查当前 PowerShell 环境：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\check_env.ps1
 ```
 
@@ -221,16 +229,16 @@ conda activate whisperx_env
 安装后可以直接用默认 H2 启动脚本验证：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
 新开 PowerShell：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\smoke_test.ps1
-.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo.mp4"
+.\scripts\smoke_test.ps1 -VideoPath "C:\path\to\your\demo.mp4"
 ```
 
 ### WhisperX 安装
@@ -291,7 +299,7 @@ $env:LLM_MODEL="codex5.5"
 首次端到端建议用 `tiny` 模型先确认跑通，跑通后再改 `base`/`small`。有 CUDA 时优先 `cuda + float16`；如果显存不足，再降低 `WHISPER_BATCH_SIZE`。
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 
 $env:VIDEO_CONDA_ENV="whisperx_env"
 $env:VIDEO_PYTHON_COMMAND="python"
@@ -303,16 +311,16 @@ $env:WHISPER_ENABLE_ALIGN="true"
 $env:WHISPER_ALIGN_FALLBACK="true"
 $env:YTDLP_PATH="$env:USERPROFILE\.conda\envs\whisperx_env\Scripts\yt-dlp.exe"
 $env:FFMPEG_PATH="ffmpeg"
-$env:HF_HOME="G:\视频分析\.cache\huggingface"
-$env:HUGGINGFACE_HUB_CACHE="G:\视频分析\.cache\huggingface\hub"
-$env:TORCH_HOME="G:\视频分析\.cache\torch"
-$env:XDG_CACHE_HOME="G:\视频分析\.cache"
+$env:HF_HOME="$PWD\.cache\huggingface"
+$env:HUGGINGFACE_HUB_CACHE="$PWD\.cache\huggingface\hub"
+$env:TORCH_HOME="$PWD\.cache\torch"
+$env:XDG_CACHE_HOME="$PWD\.cache"
 
 $env:LLM_API_URL="https://fast.smartaipro.cn/v1/chat/completions"
 $env:LLM_API_KEY="你的新 API Key"
 $env:LLM_MODEL="codex5.5"
 
-cd G:\视频分析\spring_boot
+cd .\spring_boot
 mvn spring-boot:run
 ```
 
@@ -323,7 +331,7 @@ mvn spring-boot:run
 第二步，新开 PowerShell，跑基础自检：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\check_env.ps1
 .\scripts\smoke_test.ps1
 ```
@@ -331,7 +339,7 @@ cd G:\视频分析
 第三步，测试字幕：
 
 ```powershell
-.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo.mp4"
+.\scripts\smoke_test.ps1 -VideoPath "C:\path\to\your\demo.mp4"
 ```
 
 第四步，测试下载：
@@ -365,7 +373,8 @@ cd G:\视频分析
 当前仓库没有完整 `.mvn/wrapper` 目录，优先使用本机 Maven：
 
 ```powershell
-cd G:\视频分析\spring_boot
+cd video-analysis-interpreter
+cd .\spring_boot
 mvn clean package -DskipTests
 mvn spring-boot:run
 ```
@@ -387,13 +396,13 @@ http://localhost:8080/api/test/ping
 高精度视频分析模式：
 
 ```text
-G:\视频分析\test_frontend.html
+<项目根目录>\test_frontend.html
 ```
 
 准实时同传模式：
 
 ```text
-G:\视频分析\realtime_demo.html
+<项目根目录>\realtime_demo.html
 ```
 
 如果修改了后端端口，需要同步修改 `test_frontend.html` 里的 `API_BASE`。
@@ -497,13 +506,13 @@ URL 缓存命中前提是：之前该规范化 URL 已成功分析到 `completed
 
 ## 比赛 Demo 验收步骤
 
-1. 启动后端：`cd G:\视频分析 && .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"`。
+1. 启动后端：进入克隆后的项目根目录，运行 `.\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"`。
 2. 新开 PowerShell 跑 smoke：`.\scripts\smoke_test.ps1`、`.\scripts\smoke_test.ps1 -LlmTest`、`.\scripts\smoke_test.ps1 -SubtitleTranslateTest`。
-3. 高精度模式：打开 `G:\视频分析\test_frontend.html`，上传 `G:\视频分析\video\demo_english_30s.mp4`，等待状态到 `completed`。
+3. 高精度模式：打开 `<项目根目录>\test_frontend.html`，上传下载好的 Demo 视频或任意本地短视频，等待状态到 `completed`。
 4. 高精度验收：确认页面展示视频播放器、summary、highlights、字幕列表，以及播放器下方“同步双语字幕”。
-5. 准实时模式：打开 `G:\视频分析\realtime_demo.html`，选择本地短视频或音频，点击“开始准实时同传”。
+5. 准实时模式：打开 `<项目根目录>\realtime_demo.html`，选择本地短视频或音频，点击“开始准实时同传”。
 6. 准实时验收：确认页面按分片滚动显示原文、中文字幕和“修正中/已确认”状态；未配置 `LLM_API_KEY` 时应显示翻译占位，不应让页面崩溃。
-7. 打开 `G:\视频分析\test_frontend.html?debug=1`，确认高精度模式 debug 信息仍可用。
+7. 打开 `<项目根目录>\test_frontend.html?debug=1`，确认高精度模式 debug 信息仍可用。
 8. 如果 YouTube 链接下载失败，优先用本地视频演示；YouTube 失败通常是 429、登录验证或 cookies 风控，不是字幕翻译链路问题。
 
 ## 性能分析
@@ -536,15 +545,17 @@ URL 缓存命中前提是：之前该规范化 URL 已成功分析到 `completed
 编译验证只说明代码能编译：
 
 ```powershell
-python -m py_compile G:\视频分析\extract_subtitle_whisperx.py
-cd G:\视频分析\spring_boot
+cd video-analysis-interpreter
+python -m py_compile extract_subtitle_whisperx.py
+cd .\spring_boot
 mvn clean compile
 ```
 
 启动后端后做环境自检：
 
 ```powershell
-cd G:\视频分析\spring_boot
+cd video-analysis-interpreter
+cd .\spring_boot
 mvn spring-boot:run
 ```
 
@@ -555,9 +566,9 @@ Invoke-RestMethod http://localhost:8080/api/test/health/full
 也可以直接使用 smoke 脚本：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\smoke_test.ps1
-.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo.mp4"
+.\scripts\smoke_test.ps1 -VideoPath "C:\path\to\your\demo.mp4"
 .\scripts\smoke_test.ps1 -LlmTest
 .\scripts\smoke_test.ps1 -SubtitleTranslateTest
 .\scripts\smoke_test.ps1 -VideoUrl "https://..."
@@ -570,7 +581,7 @@ cd G:\视频分析
 Invoke-RestMethod http://localhost:8080/api/test/subtitle-script `
   -Method Post `
   -ContentType "application/json" `
-  -Body '{"videoPath":"G:\\视频分析\\video\\demo.mp4","language":"auto"}'
+  -Body '{"videoPath":"C:\\path\\to\\demo.mp4","language":"auto"}'
 ```
 
 ```powershell

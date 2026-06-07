@@ -11,10 +11,11 @@
 
 ## 推荐演示方式
 
-推荐使用本地短视频演示：
+推荐使用本地短视频演示。可以下载 README 中的网盘 Demo 视频，也可以准备任意 30 秒以内英文视频/音频文件：
 
-```powershell
-G:\视频分析\video\demo_english_30s.mp4
+```text
+video-analysis-interpreter.mp4
+或 C:\path\to\your\demo.mp4
 ```
 
 不推荐比赛现场首次演示 YouTube 链接下载。YouTube 可能出现 `HTTP 429 Too Many Requests`、`Sign in to confirm you're not a bot` 或 cookies 风控，容易把演示风险转移到平台反爬，而不是产品能力本身。
@@ -24,7 +25,7 @@ G:\视频分析\video\demo_english_30s.mp4
 H2 默认模式适合 Demo，不需要额外数据库服务：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -35,17 +36,17 @@ cd G:\视频分析
 新开 PowerShell：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\smoke_test.ps1
 .\scripts\smoke_test.ps1 -LlmTest
 .\scripts\smoke_test.ps1 -SubtitleTranslateTest
-.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo_english_30s.mp4"
+.\scripts\smoke_test.ps1 -VideoPath "C:\path\to\your\demo.mp4"
 ```
 
 也可以用交付检查脚本一次性看 Demo readiness：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\demo_check.ps1
 ```
 
@@ -58,13 +59,13 @@ cd G:\视频分析
 打开：
 
 ```text
-G:\视频分析\test_frontend.html
+<项目根目录>\test_frontend.html
 ```
 
 操作步骤：
 
 1. 选择“本地上传”。
-2. 上传 `video/demo_english_30s.mp4`。
+2. 上传下载好的 Demo 视频或任意本地短视频。
 3. 等待任务状态到 `completed`。
 4. 播放视频，观察播放器下方“同步双语字幕”。
 
@@ -73,12 +74,12 @@ G:\视频分析\test_frontend.html
 打开：
 
 ```text
-G:\视频分析\realtime_demo.html
+<项目根目录>\realtime_demo.html
 ```
 
 操作步骤：
 
-1. 选择本地短视频或音频文件，推荐仍使用 `video/demo_english_30s.mp4` 或其他 30 秒以内英文素材。
+1. 选择本地短视频或音频文件，推荐使用下载好的 Demo 视频或其他 30 秒以内英文素材。
 2. 点击“开始准实时同传”。
 3. 前端会优先捕获播放中的语音音轨，通过 WebAudio 约每 3 秒生成一个独立 16kHz mono WAV 分片并发送给后端；后端慢时前端最多缓存 30 个分片，队列满时才丢弃较旧分片。
 4. 观察右侧滚动字幕流：英文识别结果应先出现，中文翻译可稍后异步补齐；每条包含时间范围、英文原文、中文字幕和“修正中/已确认”状态。

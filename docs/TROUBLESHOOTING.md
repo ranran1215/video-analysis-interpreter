@@ -7,7 +7,7 @@
 处理：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -32,7 +32,7 @@ Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*spring-boo
 处理：必须在启动后端的同一个进程里配置 Key，推荐直接用启动脚本提示输入：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -45,7 +45,7 @@ cd G:\视频分析
 处理：先用 MySQL 客户端确认账号密码可以登录，再启动后端：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\verify_mysql.ps1 -MysqlUsername "root"
 .\scripts\start_backend_mysql.ps1 -LlmModel "gpt-5.5"
 ```
@@ -99,7 +99,7 @@ cd G:\视频分析
 处理：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 .\scripts\smoke_test.ps1 -SubtitleTranslateTest
 ```

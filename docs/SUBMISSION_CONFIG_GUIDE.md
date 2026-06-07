@@ -13,7 +13,7 @@ http://localhost:8080
 推荐启动：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -22,8 +22,8 @@ cd G:\视频分析
 前端入口：
 
 ```text
-G:\视频分析\test_frontend.html
-G:\视频分析\realtime_demo.html
+<项目根目录>\test_frontend.html
+<项目根目录>\realtime_demo.html
 ```
 
 ## 2. 前端后端地址
@@ -138,14 +138,14 @@ llm:
 本项目推荐通过启动脚本传入模型名：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
 如果使用中转站，需要改 API 地址：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 `
   -LlmApiUrl "https://你的中转站域名/v1/chat/completions" `
   -LlmModel "你的模型名"
@@ -211,7 +211,7 @@ $env:MYSQL_PASSWORD="你的密码"
 启动 MySQL profile：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_mysql.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -260,7 +260,7 @@ video:
 推荐不要手动改 `application.yml`，而是使用启动脚本：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
@@ -277,7 +277,7 @@ cd G:\视频分析
 如果换机器后 WhisperX 环境不同，需要重点检查：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\check_env.ps1
 ```
 
@@ -309,7 +309,7 @@ downloader:
 如果 YouTube 出现登录验证或 429，可以运行：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5" -DownloaderCookiesFromBrowser "edge"
 ```
 
@@ -414,11 +414,11 @@ POST /api/test/downloader
 推荐验证：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\demo_check.ps1
 .\scripts\smoke_test.ps1
 
-cd G:\视频分析\spring_boot
+cd .\spring_boot
 mvn -q -DskipTests compile
 ```
 
@@ -427,7 +427,7 @@ mvn -q -DskipTests compile
 如果只是在本机录制或提交演示，通常只需要：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 

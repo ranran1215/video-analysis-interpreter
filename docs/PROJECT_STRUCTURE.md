@@ -5,7 +5,7 @@
 ## 顶层目录
 
 ```text
-G:\视频分析
+video-analysis-interpreter
 ├── spring_boot/                    # Spring Boot 后端
 ├── scripts/                        # PowerShell 和 Python 辅助脚本
 ├── docs/                           # 演示、故障排查、提交配置说明
@@ -143,20 +143,20 @@ docs/
 H2 默认模式：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
 MySQL 可选模式：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_mysql.ps1 -LlmModel "gpt-5.5"
 ```
 
 演示页面：
 
 ```text
-G:\视频分析\test_frontend.html
-G:\视频分析\realtime_demo.html
+<项目根目录>\test_frontend.html
+<项目根目录>\realtime_demo.html
 ```

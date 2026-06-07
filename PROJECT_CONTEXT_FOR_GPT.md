@@ -108,14 +108,14 @@ $env:WHISPER_ALIGN_FALLBACK="true"
 本机推荐启动方式：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
 MySQL 持久化模式：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 mysql -u root -p < scripts/init_mysql.sql
 $env:MYSQL_USERNAME="root"
 $env:MYSQL_PASSWORD="你的密码"
@@ -206,9 +206,9 @@ $env:LLM_MAX_INPUT_CHARS="20000"
 Smoke 脚本：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\smoke_test.ps1
-.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo.mp4"
+.\scripts\smoke_test.ps1 -VideoPath "<项目根目录>\video\demo.mp4"
 .\scripts\smoke_test.ps1 -LlmTest
 .\scripts\smoke_test.ps1 -SubtitleTranslateTest
 .\scripts\smoke_test.ps1 -VideoUrl "https://..."
@@ -271,14 +271,14 @@ $env:LLM_MODEL="gpt-5.5"
 推荐首次端到端启动方式：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
 如果 YouTube 出现 `Sign in to confirm you're not a bot` 或 `HTTP 429`，使用浏览器 cookies 重新启动：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5" -DownloaderCookiesFromBrowser "edge"
 ```
 
@@ -298,15 +298,15 @@ cd G:\视频分析
 - `WHISPER_COMPUTE_TYPE=float16`
 - `WHISPER_ENABLE_ALIGN=false`（默认快模式）
 - `DOWNLOADER_JS_RUNTIMES=node`（如果本机有 Node）
-- HuggingFace/Torch 缓存目录到 `G:\视频分析\.cache`
+- HuggingFace/Torch 缓存目录到 `$PWD\.cache`
 
 首次测试建议 `WHISPER_MODEL=tiny`，确认跑通后再改 `base`/`small`。如果显存不足，先降低 `WHISPER_BATCH_SIZE`。如需要精细 forced alignment，启动脚本加 `-EnableAlign`，但长视频可能显著变慢。
 
 推荐验证顺序：
 
-1. `cd G:\视频分析 && .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"`
-2. 新开 PowerShell：`cd G:\视频分析 && .\scripts\smoke_test.ps1`
-3. 字幕：`.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo.mp4"`
+1. `cd video-analysis-interpreter && .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"`
+2. 新开 PowerShell：`cd video-analysis-interpreter && .\scripts\smoke_test.ps1`
+3. 字幕：`.\scripts\smoke_test.ps1 -VideoPath "<项目根目录>\video\demo.mp4"`
 4. 下载：`.\scripts\smoke_test.ps1 -VideoUrl "https://..."`
 5. LLM：`.\scripts\smoke_test.ps1 -LlmTest`
 6. 字幕翻译：`.\scripts\smoke_test.ps1 -SubtitleTranslateTest`
@@ -322,7 +322,7 @@ MySQL 验证顺序是在上述流程前先执行 `scripts/init_mysql.sql` 并用
 检查当前环境：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\check_env.ps1
 ```
 
@@ -391,7 +391,7 @@ YouTube 的真实限制：
 如果浏览器 cookies 方式仍失败，可以导出 Netscape cookies 文件后设置：
 
 ```powershell
-$env:DOWNLOADER_COOKIES_FILE="G:\视频分析\cookies.txt"
+$env:DOWNLOADER_COOKIES_FILE=".\cookies.txt"
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 

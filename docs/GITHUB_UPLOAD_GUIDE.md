@@ -1,6 +1,12 @@
 # GitHub 上传指南
 
-本文用于把本项目上传到 GitHub。项目当前不是 git 仓库，需要先在 GitHub 网页创建空仓库，再在本地初始化并推送。
+本文用于把本项目上传或更新到 GitHub。当前推荐仓库地址：
+
+```text
+https://github.com/ranran1215/video-analysis-interpreter
+```
+
+如果仓库已经存在，后续只需要在项目根目录执行 `git add`、`git commit`、`git push`。如果要从零创建新仓库，可以按下面步骤操作。
 
 ## 1. 在 GitHub 网页创建新仓库
 
@@ -26,7 +32,7 @@ https://github.com/ranran1215/video-analysis-interpreter.git
 打开 PowerShell：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 git init
 git branch -M main
 ```
@@ -81,7 +87,7 @@ git push -u origin main
 以后每次改完代码：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 git status --short
 git add .
 git commit -m "Update realtime interpretation demo"
@@ -125,7 +131,7 @@ git push
 GitHub 仓库不包含本地视频素材和录屏视频。当前本地 Demo 录屏是：
 
 ```text
-G:\视频分析\屏幕录制 2026-06-07 224447.mp4
+video-analysis-interpreter.mp4
 ```
 
 这个文件约 1GB，不能直接提交到 GitHub。当前已上传到百度网盘，链接已放到 `README.md` 的 `Demo 视频` 小节。

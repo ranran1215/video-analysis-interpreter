@@ -2,7 +2,7 @@
 
 这是一个 Spring Boot 2.7.18 后端服务，负责视频上传、在线视频下载、WhisperX 字幕提取、OpenAI-compatible LLM 分析、数据库持久化缓存和视频播放。默认使用 H2 本地文件库，也可以通过 `mysql` profile 切换到 MySQL。
 
-Demo 推荐使用项目根目录的 `scripts/start_backend_local.ps1`、`scripts/demo_check.ps1` 和 `video/demo_english_30s.mp4`。完整演示步骤见 `../docs/DEMO_GUIDE.md`，故障排查见 `../docs/TROUBLESHOOTING.md`。
+Demo 推荐使用项目根目录的 `scripts/start_backend_local.ps1` 和 `scripts/demo_check.ps1`。演示视频请从 README 网盘链接下载，或换成任意本地短视频/音频文件。完整演示步骤见 `../docs/DEMO_GUIDE.md`，故障排查见 `../docs/TROUBLESHOOTING.md`。
 
 ## 真实技术栈
 
@@ -24,14 +24,14 @@ Demo 推荐使用项目根目录的 `scripts/start_backend_local.ps1`、`scripts
 默认 H2 模式不需要额外数据库服务，适合快速开发：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\start_backend_local.ps1 -LlmModel "gpt-5.5"
 ```
 
 MySQL 模式先创建数据库：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 mysql -u root -p < scripts/init_mysql.sql
 ```
 
@@ -102,7 +102,7 @@ $env:WHISPER_ALIGN_FALLBACK="true"
 只检查：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\check_env.ps1
 ```
 
@@ -133,22 +133,23 @@ conda activate whisperx_env
 安装后验证：
 
 ```powershell
-cd G:\视频分析\spring_boot
+cd video-analysis-interpreter
+cd .\spring_boot
 mvn spring-boot:run
 ```
 
 新开 PowerShell：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\smoke_test.ps1
-.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo.mp4"
+.\scripts\smoke_test.ps1 -VideoPath "C:\path\to\your\demo.mp4"
 ```
 
 交付前也可以运行：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\demo_check.ps1
 ```
 
@@ -208,7 +209,7 @@ $env:LLM_MODEL="codex5.5"
 首次跑通建议用 `tiny` 模型，成功后再切 `base`/`small`。
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 
 $env:VIDEO_CONDA_ENV="whisperx_env"
 $env:VIDEO_PYTHON_COMMAND="python"
@@ -220,16 +221,16 @@ $env:WHISPER_ENABLE_ALIGN="true"
 $env:WHISPER_ALIGN_FALLBACK="true"
 $env:YTDLP_PATH="$env:USERPROFILE\.conda\envs\whisperx_env\Scripts\yt-dlp.exe"
 $env:FFMPEG_PATH="ffmpeg"
-$env:HF_HOME="G:\视频分析\.cache\huggingface"
-$env:HUGGINGFACE_HUB_CACHE="G:\视频分析\.cache\huggingface\hub"
-$env:TORCH_HOME="G:\视频分析\.cache\torch"
-$env:XDG_CACHE_HOME="G:\视频分析\.cache"
+$env:HF_HOME="$PWD\.cache\huggingface"
+$env:HUGGINGFACE_HUB_CACHE="$PWD\.cache\huggingface\hub"
+$env:TORCH_HOME="$PWD\.cache\torch"
+$env:XDG_CACHE_HOME="$PWD\.cache"
 
 $env:LLM_API_URL="https://fast.smartaipro.cn/v1/chat/completions"
 $env:LLM_API_KEY="你的新 API Key"
 $env:LLM_MODEL="codex5.5"
 
-cd G:\视频分析\spring_boot
+cd .\spring_boot
 mvn spring-boot:run
 ```
 
@@ -238,7 +239,8 @@ mvn spring-boot:run
 当前项目没有完整 Maven Wrapper 目录，优先使用本机 Maven：
 
 ```powershell
-cd G:\视频分析\spring_boot
+cd video-analysis-interpreter
+cd .\spring_boot
 mvn clean package -DskipTests
 mvn spring-boot:run
 ```
@@ -252,7 +254,7 @@ java -jar target\video-analysis-1.0.0.jar
 前端页面在同级目录：
 
 ```text
-G:\视频分析\test_frontend.html
+<项目根目录>\test_frontend.html
 ```
 
 默认后端地址是 `http://localhost:8080`。
@@ -366,7 +368,7 @@ URL 规范化规则：去掉 `#fragment`，小写 host，删除 `utm_source`、`
 编译验证：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 python -m py_compile .\extract_subtitle_whisperx.py
 cd .\spring_boot
 mvn clean compile
@@ -375,7 +377,8 @@ mvn clean compile
 启动服务：
 
 ```powershell
-cd G:\视频分析\spring_boot
+cd video-analysis-interpreter
+cd .\spring_boot
 mvn spring-boot:run
 ```
 
@@ -391,7 +394,7 @@ Invoke-RestMethod http://localhost:8080/api/test/health/full
 Invoke-RestMethod http://localhost:8080/api/test/subtitle-script `
   -Method Post `
   -ContentType "application/json" `
-  -Body '{"videoPath":"G:\\视频分析\\video\\demo.mp4","language":"auto"}'
+  -Body '{"videoPath":"C:\\path\\to\\demo.mp4","language":"auto"}'
 ```
 
 LLM 链路验证：
@@ -433,16 +436,16 @@ Invoke-RestMethod http://localhost:8080/api/test/translate-subtitles `
 Smoke 脚本：
 
 ```powershell
-cd G:\视频分析
+cd video-analysis-interpreter
 .\scripts\smoke_test.ps1
-.\scripts\smoke_test.ps1 -VideoPath "G:\视频分析\video\demo.mp4"
+.\scripts\smoke_test.ps1 -VideoPath "C:\path\to\your\demo.mp4"
 .\scripts\smoke_test.ps1 -LlmTest
 .\scripts\smoke_test.ps1 -SubtitleTranslateTest
 .\scripts\smoke_test.ps1 -VideoUrl "https://..."
 .\scripts\smoke_test.ps1 -VideoUrlCacheTest "https://..."
 ```
 
-完整端到端验证：打开 `G:\视频分析\test_frontend.html`，上传一个 30 秒以内小视频，观察状态从 `processing` / `extracting_subtitle` / `analyzing` / `completed` 变化，并确认播放器下方同步显示原文和中文字幕。
+完整端到端验证：打开 `<项目根目录>\test_frontend.html`，上传一个 30 秒以内小视频，观察状态从 `processing` / `extracting_subtitle` / `analyzing` / `completed` 变化，并确认播放器下方同步显示原文和中文字幕。
 
 验证结果要分开判断：
 
