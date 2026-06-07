@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 同声传译助手</title>
+    <style>
+        :root {
+            --ink: #16211f;
+            --muted: #5e6f6a;
+            --paper: #f4efe5;
+            --panel: rgba(255, 252, 244, 0.92);
+            --line: rgba(22, 33, 31, 0.12);
+            --green: #0f8b6d;
+            --green-dark: #075f4a;
+            --amber: #e5a83a;
+            --blue: #1c5f7a;
+            --danger: #bc4b40;
+            --shadow: 0 26px 80px rgba(17, 42, 36, 0.22);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at 12% 14%, rgba(229, 168, 58, 0.25), transparent 28%),
+                radial-gradient(circle at 82% 8%, rgba(15, 139, 109, 0.18), transparent 26%),
+                linear-gradient(145deg, #17352f 0%, #d8c7a5 48%, #f4efe5 100%);
+            padding: 32px;
+        }
+
+        .shell {
+            max-width: 1280px;
+            margin: 0 auto;
+            border-radius: 30px;
+            background: var(--panel);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .hero {
+            position: relative;
+            padding: 42px;
+            color: #fffaf0;
+            background:
+                linear-gradient(135deg, rgba(6, 53, 42, 0.95), rgba(19, 99, 82, 0.88)),
+                repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0 1px, transparent 1px 16px);
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -90px;
+            top: -120px;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            background: rgba(229, 168, 58, 0.22);
+            filter: blur(4px);
+        }
+
+        .eyebrow {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            padding: 7px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 999px;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #f8e6bb;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        h1 {
+            position: relative;
+            z-index: 1;
+            margin: 18px 0 10px;
+            max-width: 760px;
+            font-size: clamp(34px, 5vw, 64px);
+            line-height: 0.98;
+            letter-spacing: -0.04em;
+        }
+
+        .hero p {
+            position: relative;
+            z-index: 1;
+            max-width: 780px;
+            margin: 0;
+            color: rgba(255, 250, 240, 0.86);
+            font-size: 17px;
+            line-height: 1.75;
+        }
+
+        .mode-nav {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 24px;
+        }
+
+        .mode-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 16px;
+            border-radius: 999px;
+            color: #fffaf0;
+            text-decoration: none;
+            font-weight: 800;
+            border: 1px solid rgba(255, 250, 240, 0.28);
+            background: rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .mode-link:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.16);
+        }
+
+        .mode-link.active {
+            background: rgba(229, 168, 58, 0.22);
+            color: #ffe7a5;
+        }
+
+        .content {
+            padding: 32px;
+            display: grid;
+            grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.74);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 14px 40px rgba(33, 42, 38, 0.08);
+        }
+
+        .card h2 {
+            margin: 0 0 12px;
+            font-size: 22px;
+            letter-spacing: -0.02em;
+        }
+
+        .hint {
+            margin: 0 0 18px;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .drop {
+            border: 2px dashed rgba(15, 139, 109, 0.38);
+            border-radius: 20px;
+            padding: 24px;
+            background: rgba(15, 139, 109, 0.06);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fffaf0;
+            color: var(--ink);
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 180px;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .language-select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fffaf0;
+            color: var(--green-dark);
+            font-weight: 800;
+        }
+
+        .media-wrap {
+            margin-top: 18px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #12201d;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        video,
+        audio {
+            display: block;
+            width: 100%;
+            min-height: 72px;
+        }
+
+        audio {
+            padding: 18px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        button {
+            border: 0;
+            border-radius: 999px;
+            padding: 13px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(15, 95, 74, 0.18);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.48;
+        }
+
+        .primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+        }
+
+        .secondary {
+            color: var(--green-dark);
+            background: rgba(15, 139, 109, 0.12);
+        }
+
+        .ghost {
+            color: var(--ink);
+            background: #fffaf0;
+            border: 1px solid var(--line);
+        }
+
+        .status {
+            margin-top: 16px;
+            padding: 13px 14px;
+            border-radius: 16px;
+            background: #fffaf0;
+            border: 1px solid var(--line);
+            color: var(--muted);
+            line-height: 1.6;
+            min-height: 50px;
+        }
+
+        .status.warn {
+            color: #7a4a00;
+            background: rgba(229, 168, 58, 0.18);
+            border-color: rgba(229, 168, 58, 0.38);
+        }
+
+        .status.error {
+            color: #7d241d;
+            background: rgba(188, 75, 64, 0.12);
+            border-color: rgba(188, 75, 64, 0.28);
+        }
+
+        .meter {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .metric {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255, 250, 240, 0.82);
+            border: 1px solid var(--line);
+        }
+
+        .metric strong {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 20px;
+            color: var(--green-dark);
+        }
+
+        .metric span {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 620px;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+
+        .empty {
+            padding: 28px;
+            border-radius: 18px;
+            border: 1px dashed rgba(22, 33, 31, 0.18);
+            color: var(--muted);
+            background: rgba(255, 250, 240, 0.62);
+            line-height: 1.7;
+        }
+
+        .segment {
+            position: relative;
+            padding: 16px 16px 16px 18px;
+            border-radius: 18px;
+            background: #fffaf0;
+            border: 1px solid var(--line);
+        }
+
+        .segment.is-new {
+            animation: rise 0.28s ease-out;
+        }
+
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .segment.final {
+            border-left: 5px solid var(--green);
+        }
+
+        .segment.provisional {
+            border-left: 5px solid var(--amber);
+            background: rgba(255, 250, 240, 0.72);
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 9px;
+        }
+
+        .time {
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .badge {
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .badge.final {
+            color: var(--green-dark);
+            background: rgba(15, 139, 109, 0.12);
+        }
+
+        .badge.provisional {
+            color: #7a4a00;
+            background: rgba(229, 168, 58, 0.2);
+        }
+
+        .source {
+            color: #41514d;
+            line-height: 1.65;
+        }
+
+        .translated {
+            margin-top: 7px;
+            color: var(--ink);
+            font-size: 20px;
+            line-height: 1.55;
+            font-weight: 800;
+        }
+
+        .footer-note {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(28, 95, 122, 0.08);
+            color: #264d5d;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        a {
+            color: var(--green-dark);
+            font-weight: 800;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 16px;
+            }
+
+            .hero,
+            .content {
+                padding: 24px;
+            }
+
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .meter {
+                grid-template-columns: 1fr;
+            }
+
+            .field-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <section class="hero">
+            <div class="eyebrow">Real-time Interpretation</div>
+            <h1>AI 同声传译助手</h1>
+            <div class="mode-nav">
+                <a class="mode-link" href="test_frontend.html">高精度视频分析模式</a>
+                <a class="mode-link active" href="realtime_demo.html">实时同传模式</a>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="card">
+                <h2>输入与控制</h2>
+
+                <div class="drop">
+                    <div class="field-row">
+                        <input id="fileInput" type="file" accept="video/*,audio/*">
+                        <select id="languageSelect" class="language-select" title="源语言">
+                            <option value="en" selected>源语言：英文</option>
+                            <option value="auto">源语言：自动</option>
+                            <option value="zh">源语言：中文</option>
+                        </select>
+                    </div>
+                    <div class="media-wrap">
+                        <video id="videoPlayer" controls style="display:none;"></video>
+                        <audio id="audioPlayer" controls style="display:none;"></audio>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button id="startBtn" class="primary" disabled>开始同传</button>
+                    <button id="stopBtn" class="secondary" disabled>停止发送</button>
+                    <button id="finishBtn" class="ghost" disabled>结束并确认全部字幕</button>
+                </div>
+
+                <div id="statusBox" class="status">请选择本地视频或音频文件。</div>
+
+                <div class="meter">
+                    <div class="metric">
+                        <strong id="sessionMetric">未开始</strong>
+                        <span>会话</span>
+                    </div>
+                    <div class="metric">
+                        <strong id="chunkMetric">0</strong>
+                        <span>处理段数</span>
+                    </div>
+                    <div class="metric">
+                        <strong id="latencyMetric">-</strong>
+                        <span>最近请求耗时</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>实时字幕流</h2>
+                <div id="subtitleFeed" class="feed">
+                    <div class="empty">等待开始</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/realtime';
+        const WINDOW_MS = 5000;
+        const STEP_MS = 3000;
+        const FIRST_PREVIEW_MS = 3000;
+        const MAX_CHUNK_QUEUE_SIZE = 30;
+        const SUBTITLE_POLL_INTERVAL_MS = 1000;
+        const MEDIA_AUDIO_TRACK_WAIT_MS = 5000;
+        const MAX_DECODE_FALLBACK_BYTES = 80 * 1024 * 1024;
+
+        const fileInput = document.getElementById('fileInput');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const finishBtn = document.getElementById('finishBtn');
+        const statusBox = document.getElementById('statusBox');
+        const subtitleFeed = document.getElementById('subtitleFeed');
+        const sessionMetric = document.getElementById('sessionMetric');
+        const chunkMetric = document.getElementById('chunkMetric');
+        const latencyMetric = document.getElementById('latencyMetric');
+        const languageSelect = document.getElementById('languageSelect');
+
+        let selectedFile = null;
+        let objectUrl = null;
+        let currentSessionId = null;
+        let running = false;
+        let chunkCount = 0;
+        let skippedCount = 0;
+        let droppedCount = 0;
+        let processingQueue = false;
+        let chunkQueue = [];
+        let currentProcessingChunk = null;
+        let subtitlePollTimer = null;
+        let fallbackRecorder = null;
+        let streamCaptureCleanup = null;
+        let sendQueue = Promise.resolve();
+
+        fileInput.addEventListener('change', handleFileSelect);
+        startBtn.addEventListener('click', startRealtimeDemo);
+        stopBtn.addEventListener('click', stopSending);
+        finishBtn.addEventListener('click', finishSession);
+
+        function handleFileSelect(event) {
+            selectedFile = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+            resetRunState();
+
+            if (!selectedFile) {
+                showStatus('请选择本地视频或音频文件。');
+                startBtn.disabled = true;
+                return;
+            }
+
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+            objectUrl = URL.createObjectURL(selectedFile);
+
+            const isAudio = selectedFile.type && selectedFile.type.startsWith('audio/');
+            const player = isAudio ? audioPlayer : videoPlayer;
+            const other = isAudio ? videoPlayer : audioPlayer;
+            other.pause();
+            other.removeAttribute('src');
+            other.style.display = 'none';
+            player.src = objectUrl;
+            player.style.display = 'block';
+            player.load();
+
+            startBtn.disabled = false;
+            showStatus(`已选择文件：${selectedFile.name}。点击“开始同传”后开始识别与翻译。`);
+        }
+
+        async function startRealtimeDemo() {
+            if (!selectedFile) {
+                showStatus('请先选择文件。', 'error');
+                return;
+            }
+
+            resetRunState();
+            running = true;
+            setButtonState(true);
+
+            try {
+                showStatus('正在准备同传服务...');
+                const session = await postJson(`${API_BASE}/session/start`);
+                currentSessionId = session.sessionId;
+                sessionMetric.textContent = currentSessionId.slice(0, 8);
+                finishBtn.disabled = false;
+                startSubtitlePolling();
+
+                const player = getActivePlayer();
+                player.currentTime = 0;
+                await player.play();
+                showStatus('已开始播放，字幕会陆续显示。');
+
+                try {
+                    await runAudioContextStreaming(player);
+                } catch (streamError) {
+                    if (selectedFile && selectedFile.size > MAX_DECODE_FALLBACK_BYTES) {
+                        throw streamError;
+                    }
+                    showStatus('正在准备音频内容，请稍候...', 'warn');
+                    const decodedAudioBuffer = await decodeSelectedFile();
+                    player.currentTime = 0;
+                    await player.play();
+                    await runWindowedWavLoop(player, decodedAudioBuffer);
+                }
+            } catch (error) {
+                console.error(error);
+                showStatus(`同传启动失败：${friendlyBackendError(error)}`, 'error');
+                running = false;
+                setButtonState(false);
+            }
+        }
+
+        async function runWindowedWavLoop(player, audioBuffer) {
+            showStatus('音频已准备好，正在开始识别。');
+            const durationMs = Math.floor(audioBuffer.duration * 1000);
+
+            await enqueueFirstPreviewChunk(audioBuffer, player, durationMs);
+
+            let chunkStartMs = 0;
+            while (running && chunkStartMs < durationMs) {
+                const chunkEndMs = Math.min(chunkStartMs + WINDOW_MS, durationMs);
+                await waitForPlaybackTime(player, chunkEndMs / 1000);
+                if (!running) {
+                    break;
+                }
+
+                const wavBlob = buildWavChunk(audioBuffer, chunkStartMs / 1000, chunkEndMs / 1000);
+                enqueueChunk(wavBlob, chunkStartMs, chunkEndMs, `chunk_${chunkStartMs}_${chunkEndMs}.wav`);
+
+                chunkStartMs += STEP_MS;
+            }
+
+            if (running) {
+                showStatus('播放分析已完成，字幕仍会继续补齐。');
+                running = false;
+                setButtonState(false);
+            }
+        }
+
+        async function enqueueFirstPreviewChunk(audioBuffer, player, durationMs) {
+            const previewEndMs = Math.min(FIRST_PREVIEW_MS, durationMs);
+            if (previewEndMs <= 0) {
+                return;
+            }
+
+            await waitForPlaybackTime(player, previewEndMs / 1000);
+            if (!running) {
+                return;
+            }
+
+            const wavBlob = buildWavChunk(audioBuffer, 0, previewEndMs / 1000);
+            enqueueChunk(wavBlob, 0, previewEndMs, `preview_0_${previewEndMs}.wav`);
+        }
+
+        async function decodeSelectedFile() {
+            const arrayBuffer = await selectedFile.arrayBuffer();
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) {
+                throw new Error('当前浏览器不支持 Web Audio decodeAudioData');
+            }
+            const audioContext = new AudioContextClass();
+            try {
+                return await audioContext.decodeAudioData(arrayBuffer.slice(0));
+            } finally {
+                if (audioContext.close) {
+                    audioContext.close();
+                }
+            }
+        }
+
+        async function runAudioContextStreaming(player) {
+            if (!player.captureStream && !player.mozCaptureStream) {
+                throw new Error('当前浏览器不支持 captureStream 音轨捕获');
+            }
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContextClass) {
+                throw new Error('当前浏览器不支持 Web Audio 音频采集');
+            }
+
+            showStatus('正在连接音频，请稍候...');
+            await waitForMediaReady(player);
+
+            const captureStream = player.captureStream ? player.captureStream() : player.mozCaptureStream();
+            const audioTracks = await waitForCaptureAudioTracks(captureStream, MEDIA_AUDIO_TRACK_WAIT_MS);
+            if (!audioTracks || audioTracks.length === 0) {
+                throw new Error('媒体中没有可捕获的音频轨道');
+            }
+
+            const audioContext = new AudioContextClass();
+            if (audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
+            const source = audioContext.createMediaStreamSource(new MediaStream(audioTracks));
+            const processor = audioContext.createScriptProcessor(4096, 1, 1);
+            const silentGain = audioContext.createGain();
+            silentGain.gain.value = 0;
+
+            const sourceSampleRate = audioContext.sampleRate;
+            const chunkSampleLimit = Math.max(1, Math.round(sourceSampleRate * STEP_MS / 1000));
+            let bufferedBlocks = [];
+            let bufferedSamples = 0;
+            let lastChunkEndMs = 0;
+            let streamStopped = false;
+
+            const flushBufferedAudio = () => {
+                if (bufferedSamples <= 0 || !currentSessionId) {
+                    return;
+                }
+                const monoSamples = mergeFloatBlocks(bufferedBlocks, bufferedSamples);
+                bufferedBlocks = [];
+                bufferedSamples = 0;
+
+                const sampleDurationMs = Math.max(1, Math.round(monoSamples.length * 1000 / sourceSampleRate));
+                const playbackMs = Math.round(player.currentTime * 1000);
+                const endMs = Math.max(lastChunkEndMs + sampleDurationMs, playbackMs);
+                const startMs = lastChunkEndMs;
+                lastChunkEndMs = endMs;
+                const wavBlob = buildWavBlobFromSamples(monoSamples, sourceSampleRate);
+                enqueueChunk(wavBlob, startMs, endMs, `chunk_${startMs}_${endMs}.wav`);
+            };
+
+            processor.onaudioprocess = event => {
+                if (streamStopped || !running || !currentSessionId || player.paused || player.ended) {
+                    return;
+                }
+                const inputBuffer = event.inputBuffer;
+                const block = mixToMono(inputBuffer);
+                bufferedBlocks.push(block);
+                bufferedSamples += block.length;
+                if (bufferedSamples >= chunkSampleLimit) {
+                    flushBufferedAudio();
+                }
+            };
+
+            source.connect(processor);
+            processor.connect(silentGain);
+            silentGain.connect(audioContext.destination);
+
+            streamCaptureCleanup = () => {
+                if (streamStopped) {
+                    return;
+                }
+                streamStopped = true;
+                flushBufferedAudio();
+                try {
+                    processor.disconnect();
+                } catch (error) {
+                    // Ignore cleanup errors in demo mode.
+                }
+                try {
+                    source.disconnect();
+                } catch (error) {
+                    // Ignore cleanup errors in demo mode.
+                }
+                try {
+                    silentGain.disconnect();
+                } catch (error) {
+                    // Ignore cleanup errors in demo mode.
+                }
+                if (audioContext.close) {
+                    audioContext.close();
+                }
+                streamCaptureCleanup = null;
+            };
+
+            player.addEventListener('ended', () => {
+                if (streamCaptureCleanup) {
+                    streamCaptureCleanup();
+                }
+                running = false;
+            }, { once: true });
+
+            if (player.paused) {
+                await player.play();
+            }
+            showStatus('同传已开始，字幕会陆续出现。');
+        }
+
+        function waitForMediaReady(player) {
+            if (player.readyState >= 2) {
+                return Promise.resolve();
+            }
+
+            return new Promise(resolve => {
+                let settled = false;
+                const cleanup = () => {
+                    player.removeEventListener('loadedmetadata', onReady);
+                    player.removeEventListener('canplay', onReady);
+                    player.removeEventListener('playing', onReady);
+                };
+                const onReady = () => {
+                    if (settled) {
+                        return;
+                    }
+                    settled = true;
+                    cleanup();
+                    resolve();
+                };
+                player.addEventListener('loadedmetadata', onReady, { once: true });
+                player.addEventListener('canplay', onReady, { once: true });
+                player.addEventListener('playing', onReady, { once: true });
+                window.setTimeout(onReady, 1200);
+            });
+        }
+
+        function waitForCaptureAudioTracks(captureStream, timeoutMs) {
+            const currentTracks = captureStream.getAudioTracks();
+            if (currentTracks && currentTracks.length > 0) {
+                return Promise.resolve(currentTracks);
+            }
+
+            return new Promise(resolve => {
+                let settled = false;
+                const cleanup = () => {
+                    captureStream.removeEventListener('addtrack', onAddTrack);
+                };
+                const finish = () => {
+                    if (settled) {
+                        return;
+                    }
+                    settled = true;
+                    cleanup();
+                    resolve(captureStream.getAudioTracks());
+                };
+                const onAddTrack = () => {
+                    if (captureStream.getAudioTracks().length > 0) {
+                        finish();
+                    }
+                };
+                captureStream.addEventListener('addtrack', onAddTrack);
+                window.setTimeout(finish, timeoutMs);
+            });
+        }
+
+        function enqueueChunk(blob, startMs, endMs, fileName) {
+            if (!currentSessionId) {
+                return;
+            }
+
+            if (chunkQueue.length >= MAX_CHUNK_QUEUE_SIZE) {
+                const dropped = chunkQueue.shift();
+                droppedCount += 1;
+                showStatus(`系统繁忙，已跳过一小段较早内容，优先保持当前进度。累计跳过 ${droppedCount} 段。`, 'warn');
+            }
+
+            chunkQueue.push({ blob, startMs, endMs, fileName });
+            showStatus(`正在处理 ${formatMs(startMs)} - ${formatMs(endMs)} 的内容。`);
+            processChunkQueue();
+        }
+
+        async function processChunkQueue() {
+            if (processingQueue) {
+                return;
+            }
+
+            processingQueue = true;
+            try {
+                while (chunkQueue.length > 0) {
+                    const next = chunkQueue.shift();
+                    currentProcessingChunk = next;
+                    try {
+                        await sendChunk(next.blob, next.startMs, next.endMs, next.fileName);
+                    } catch (error) {
+                        console.error(error);
+                        showStatus(`本段处理失败：${friendlyBackendError(error)}`, 'error');
+                    } finally {
+                        currentProcessingChunk = null;
+                    }
+                }
+            } finally {
+                processingQueue = false;
+            }
+        }
+
+        async function sendChunk(blob, startMs, endMs, fileName) {
+            if (!currentSessionId) {
+                throw new Error('sessionId 不存在');
+            }
+
+            const startedAt = performance.now();
+            chunkCount += 1;
+            chunkMetric.textContent = String(chunkCount);
+            const formData = new FormData();
+            formData.append('sessionId', currentSessionId);
+            formData.append('chunkStartMs', String(startMs));
+            formData.append('chunkEndMs', String(endMs));
+            formData.append('language', languageSelect.value || 'auto');
+            formData.append('audioChunk', blob, fileName);
+
+            let waitedSec = 0;
+            const progressTimer = window.setInterval(() => {
+                waitedSec += 1;
+                showStatus(`正在识别 ${formatMs(startMs)} - ${formatMs(endMs)}，已等待 ${waitedSec} 秒。`);
+            }, 1000);
+
+            let data;
+            try {
+                const response = await fetch(`${API_BASE}/chunk`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(`服务返回 ${response.status}: ${text}`);
+                }
+                data = await response.json();
+            } finally {
+                window.clearInterval(progressTimer);
+            }
+
+            const durationMs = Math.round(performance.now() - startedAt);
+            latencyMetric.textContent = `${durationMs} ms`;
+            renderSubtitles(data.segments || []);
+            if (data.warning) {
+                if (isSessionExpiredWarning(data.warning)) {
+                    handleSessionExpired(data.warning);
+                    return;
+                }
+                showStatus(data.warning, 'warn');
+            } else {
+                showStatus(`已更新 ${formatMs(startMs)} - ${formatMs(endMs)} 字幕，耗时 ${durationMs} ms。`);
+            }
+        }
+
+        async function finishSession() {
+            if (!currentSessionId) {
+                showStatus('还没有可结束的 session。', 'error');
+                return;
+            }
+            running = false;
+            stopRecorderIfNeeded();
+
+            try {
+                const data = await postJson(`${API_BASE}/session/${currentSessionId}/finish`);
+                renderSubtitles(data.segments || []);
+                showStatus('所有剩余字幕已标记为已确认。');
+            } catch (error) {
+                showStatus(`结束 session 失败：${error.message}`, 'error');
+            } finally {
+                setButtonState(false);
+                finishBtn.disabled = false;
+            }
+        }
+
+        function stopSending() {
+            running = false;
+            stopRecorderIfNeeded();
+            chunkQueue = [];
+            showStatus('已停止继续识别。可以确认当前字幕。');
+            setButtonState(false);
+            finishBtn.disabled = !currentSessionId;
+        }
+
+        function stopRecorderIfNeeded() {
+            if (fallbackRecorder && fallbackRecorder.state !== 'inactive') {
+                fallbackRecorder.stop();
+            }
+            fallbackRecorder = null;
+            if (streamCaptureCleanup) {
+                streamCaptureCleanup();
+            }
+        }
+
+        function resetRunState() {
+            running = false;
+            currentSessionId = null;
+            chunkCount = 0;
+            skippedCount = 0;
+            droppedCount = 0;
+            processingQueue = false;
+            chunkQueue = [];
+            currentProcessingChunk = null;
+            fallbackRecorder = null;
+            streamCaptureCleanup = null;
+            sendQueue = Promise.resolve();
+            stopSubtitlePolling();
+            sessionMetric.textContent = '未开始';
+            chunkMetric.textContent = '0';
+            latencyMetric.textContent = '-';
+            finishBtn.disabled = true;
+            stopBtn.disabled = true;
+            subtitleFeed.innerHTML = '<div class="empty">等待开始</div>';
+        }
+
+        function setButtonState(isRunning) {
+            startBtn.disabled = isRunning || !selectedFile;
+            stopBtn.disabled = !isRunning;
+        }
+
+        async function postJson(url) {
+            const response = await fetch(url, { method: 'POST' });
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            }
+            return response.json();
+        }
+
+        async function postJsonWithProgress(url, progressMessage) {
+            let waitedSec = 0;
+            showStatus(progressMessage);
+            const progressTimer = window.setInterval(() => {
+                waitedSec += 1;
+                showStatus(`${progressMessage} 已等待 ${waitedSec} 秒。`);
+            }, 1000);
+            try {
+                return await postJson(url);
+            } finally {
+                window.clearInterval(progressTimer);
+            }
+        }
+
+        function startSubtitlePolling() {
+            stopSubtitlePolling();
+            subtitlePollTimer = window.setInterval(refreshSubtitles, SUBTITLE_POLL_INTERVAL_MS);
+        }
+
+        function stopSubtitlePolling() {
+            if (subtitlePollTimer) {
+                window.clearInterval(subtitlePollTimer);
+                subtitlePollTimer = null;
+            }
+        }
+
+        async function refreshSubtitles() {
+            if (!currentSessionId) {
+                return;
+            }
+            try {
+                const response = await fetch(`${API_BASE}/session/${currentSessionId}/subtitles`);
+                if (!response.ok) {
+                    return;
+                }
+                const data = await response.json();
+                if (data.warning && isSessionExpiredWarning(data.warning)) {
+                    handleSessionExpired(data.warning);
+                    return;
+                }
+                renderSubtitles(data.segments || []);
+            } catch (error) {
+                console.warn('刷新实时字幕失败:', error);
+            }
+        }
+
+        function isSessionExpiredWarning(message) {
+            return typeof message === 'string'
+                && message.includes('session')
+                && (message.includes('不存在') || message.includes('过期'));
+        }
+
+        function handleSessionExpired(message) {
+            running = false;
+            stopRecorderIfNeeded();
+            stopSubtitlePolling();
+            chunkQueue = [];
+            currentProcessingChunk = null;
+            currentSessionId = null;
+            sessionMetric.textContent = '已过期';
+            setButtonState(false);
+            finishBtn.disabled = true;
+            showStatus(message, 'error');
+        }
+
+        function friendlyBackendError(error) {
+            const message = error && error.message ? error.message : String(error || '');
+            if (message.includes('HTTP 404')) {
+                return '本地服务未准备好，请重启后端后再试。';
+            }
+            if (message.includes('Failed to fetch')) {
+                return '无法连接本地服务，请确认后端已启动。';
+            }
+            if (message.includes('Web Audio') || message.includes('captureStream') || message.includes('decodeAudioData')) {
+                return '当前浏览器无法快速读取这段媒体的音频，请换一个浏览器，或换一个较短的视频/音频文件。';
+            }
+            if (message.includes('音频轨道')) {
+                return '没有读取到可用音频，请确认文件本身包含声音，或换一个浏览器再试。';
+            }
+            return message;
+        }
+
+        function getActivePlayer() {
+            return audioPlayer.style.display === 'block' ? audioPlayer : videoPlayer;
+        }
+
+        async function waitForPlaybackTime(player, targetSeconds) {
+            while (running) {
+                if (player.currentTime >= targetSeconds || player.ended) {
+                    return;
+                }
+                await delay(180);
+            }
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function mixToMono(inputBuffer) {
+            const sampleCount = inputBuffer.length;
+            const channelCount = Math.max(1, inputBuffer.numberOfChannels);
+            const mono = new Float32Array(sampleCount);
+            for (let i = 0; i < sampleCount; i++) {
+                let sample = 0;
+                for (let channel = 0; channel < channelCount; channel++) {
+                    sample += inputBuffer.getChannelData(channel)[i] || 0;
+                }
+                mono[i] = Math.max(-1, Math.min(1, sample / channelCount));
+            }
+            return mono;
+        }
+
+        function mergeFloatBlocks(blocks, totalSamples) {
+            const merged = new Float32Array(totalSamples);
+            let offset = 0;
+            blocks.forEach(block => {
+                merged.set(block, offset);
+                offset += block.length;
+            });
+            return merged;
+        }
+
+        function buildWavBlobFromSamples(sourceSamples, sourceSampleRate) {
+            const targetSampleRate = 16000;
+            const durationSec = Math.max(0.001, sourceSamples.length / sourceSampleRate);
+            const sampleCount = Math.max(1, Math.ceil(durationSec * targetSampleRate));
+            const pcm = new Int16Array(sampleCount);
+
+            for (let i = 0; i < sampleCount; i++) {
+                const sourcePosition = i * sourceSampleRate / targetSampleRate;
+                const sourceIndex = Math.min(sourceSamples.length - 1, Math.floor(sourcePosition));
+                const nextIndex = Math.min(sourceSamples.length - 1, sourceIndex + 1);
+                const ratio = Math.max(0, Math.min(1, sourcePosition - sourceIndex));
+                const current = sourceSamples[sourceIndex] || 0;
+                const next = sourceSamples[nextIndex] || current;
+                const sample = Math.max(-1, Math.min(1, current + (next - current) * ratio));
+                pcm[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+            }
+
+            return encodePcmWav(pcm, targetSampleRate);
+        }
+
+        function buildWavChunk(audioBuffer, startSec, endSec) {
+            const sourceSampleRate = audioBuffer.sampleRate;
+            const targetSampleRate = 16000;
+            const startSample = Math.max(0, Math.floor(startSec * sourceSampleRate));
+            const endSample = Math.min(audioBuffer.length, Math.ceil(endSec * sourceSampleRate));
+            const sourceSampleCount = Math.max(1, endSample - startSample);
+            const durationSec = Math.max(0.001, sourceSampleCount / sourceSampleRate);
+            const sampleCount = Math.max(1, Math.ceil(durationSec * targetSampleRate));
+            const channelCount = audioBuffer.numberOfChannels;
+            const pcm = new Int16Array(sampleCount);
+
+            for (let i = 0; i < sampleCount; i++) {
+                let sample = 0;
+                const sourcePosition = startSample + (i * sourceSampleRate / targetSampleRate);
+                const sourceIndex = Math.min(endSample - 1, Math.floor(sourcePosition));
+                const nextIndex = Math.min(endSample - 1, sourceIndex + 1);
+                const ratio = Math.max(0, Math.min(1, sourcePosition - sourceIndex));
+                for (let channel = 0; channel < channelCount; channel++) {
+                    const channelData = audioBuffer.getChannelData(channel);
+                    const current = channelData[sourceIndex] || 0;
+                    const next = channelData[nextIndex] || current;
+                    sample += current + (next - current) * ratio;
+                }
+                sample = Math.max(-1, Math.min(1, sample / channelCount));
+                pcm[i] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
+            }
+
+            return encodePcmWav(pcm, targetSampleRate);
+        }
+
+        function encodePcmWav(pcm, sampleRate) {
+            const buffer = new ArrayBuffer(44 + pcm.length * 2);
+            const view = new DataView(buffer);
+            writeAscii(view, 0, 'RIFF');
+            view.setUint32(4, 36 + pcm.length * 2, true);
+            writeAscii(view, 8, 'WAVE');
+            writeAscii(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeAscii(view, 36, 'data');
+            view.setUint32(40, pcm.length * 2, true);
+
+            let offset = 44;
+            for (let i = 0; i < pcm.length; i++) {
+                view.setInt16(offset, pcm[i], true);
+                offset += 2;
+            }
+
+            return new Blob([view], { type: 'audio/wav' });
+        }
+
+        function writeAscii(view, offset, value) {
+            for (let i = 0; i < value.length; i++) {
+                view.setUint8(offset + i, value.charCodeAt(i));
+            }
+        }
+
+        function renderSubtitles(segments) {
+            if (!segments || segments.length === 0) {
+                if (!subtitleFeed.querySelector('.segment')) {
+                    subtitleFeed.innerHTML = '<div class="empty">暂未识别到字幕，请继续播放等待后续内容</div>';
+                }
+                return;
+            }
+
+            const wasNearBottom = isSubtitleFeedNearBottom();
+            const previousScrollTop = subtitleFeed.scrollTop;
+            const existingItems = new Map();
+            subtitleFeed.querySelectorAll('.segment[data-key]').forEach(item => {
+                existingItems.set(item.dataset.key, item);
+            });
+
+            const fragment = document.createDocumentFragment();
+            segments.forEach(segment => {
+                const key = getSubtitleKey(segment);
+                let item = existingItems.get(key);
+                if (!item) {
+                    item = createSubtitleItem(key);
+                }
+                updateSubtitleItem(item, segment);
+                fragment.appendChild(item);
+            });
+
+            subtitleFeed.replaceChildren(fragment);
+            if (wasNearBottom) {
+                subtitleFeed.scrollTop = subtitleFeed.scrollHeight;
+            } else {
+                subtitleFeed.scrollTop = previousScrollTop;
+            }
+        }
+
+        function createSubtitleItem(key) {
+            const item = document.createElement('div');
+            item.className = 'segment is-new';
+            item.dataset.key = key;
+            item.innerHTML = `
+                <div class="row">
+                    <span class="time"></span>
+                    <span class="badge"></span>
+                </div>
+                <div class="source"></div>
+                <div class="translated"></div>
+            `;
+            item.addEventListener('animationend', () => item.classList.remove('is-new'), { once: true });
+            return item;
+        }
+
+        function updateSubtitleItem(item, segment) {
+            const status = segment.status === 'final' ? 'final' : 'provisional';
+            const renderHash = [
+                segment.startMs,
+                segment.endMs,
+                segment.originalText || '',
+                segment.translatedText || '',
+                status
+            ].join('|');
+            if (item.dataset.renderHash === renderHash) {
+                return;
+            }
+
+            item.dataset.renderHash = renderHash;
+            item.classList.toggle('final', status === 'final');
+            item.classList.toggle('provisional', status !== 'final');
+            item.querySelector('.time').textContent = `${formatMs(segment.startMs)} - ${formatMs(segment.endMs)}`;
+
+            const badge = item.querySelector('.badge');
+            badge.className = `badge ${status}`;
+            badge.textContent = status === 'final' ? '已确认' : '修正中';
+
+            item.querySelector('.source').textContent = segment.originalText || '';
+            item.querySelector('.translated').textContent = segment.translatedText || '翻译中...';
+        }
+
+        function getSubtitleKey(segment) {
+            return [
+                segment.sessionId || currentSessionId || 'session',
+                segment.startMs,
+                segment.endMs
+            ].join(':');
+        }
+
+        function isSubtitleFeedNearBottom() {
+            return subtitleFeed.scrollHeight - subtitleFeed.scrollTop - subtitleFeed.clientHeight < 80;
+        }
+
+        function showStatus(message, type) {
+            statusBox.className = `status ${type || ''}`.trim();
+            statusBox.textContent = message || '';
+        }
+
+        function formatMs(ms) {
+            const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const tenths = Math.floor((Math.max(0, ms) % 1000) / 100);
+            return `${minutes}:${String(seconds).padStart(2, '0')}.${tenths}`;
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+    </script>
+</body>
+</html>
