@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频分析系统 - 测试页面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: backgroundMove 20s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes backgroundMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: headerPulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes headerPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: titleFloat 3s ease-in-out infinite;
+        }
+        
+        .header p {
+            position: relative;
+            z-index: 1;
+            opacity: 0.95;
+            font-size: 16px;
+        }
+
+        .mode-nav {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .mode-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 18px;
+            border-radius: 999px;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.32);
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+            transition: all 0.25s ease;
+        }
+
+        .mode-link:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.24);
+        }
+
+        .mode-link.active {
+            background: rgba(255, 255, 255, 0.28);
+        }
+        
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .upload-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            padding: 40px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            border: 2px dashed transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.1);
+        }
+        
+        .upload-section h2 {
+            font-size: 24px;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 45px;
+            font-size: 17px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .upload-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .upload-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .upload-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .language-select {
+            padding: 15px 20px;
+            border-radius: 30px;
+            border: 2px solid #667eea;
+            background: white;
+            font-size: 16px;
+            font-weight: bold;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .language-select:hover {
+            background: #f0f2ff;
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .status.loading {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            display: block;
+        }
+
+        .status.info {
+            background: #eef2ff;
+            color: #3f51b5;
+            border: 2px solid #667eea;
+            display: block;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .video-section {
+            display: none;
+            margin-top: 30px;
+        }
+        
+        .video-player {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        video {
+            width: 100%;
+            display: block;
+        }
+        
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .panel {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        .panel:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transform: translateY(-5px);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .summary-text {
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .subtitle-list, .highlight-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .subtitle-item, .highlight-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .subtitle-item::before, .highlight-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .subtitle-item:hover::before, .highlight-item:hover::before {
+            left: 100%;
+        }
+        
+        .subtitle-item:hover, .highlight-item:hover {
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+            border-left-width: 6px;
+        }
+        
+        .time-tag {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-right: 10px;
+        }
+
+        .sync-subtitle-panel {
+            margin-top: 16px;
+            padding: 18px 22px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #101828 0%, #1d2939 100%);
+            color: white;
+            box-shadow: 0 10px 30px rgba(16, 24, 40, 0.18);
+        }
+
+        .sync-subtitle-title {
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #a5b4fc;
+            font-weight: 700;
+        }
+
+        .sync-subtitle-hint {
+            margin-top: 4px;
+            margin-bottom: 12px;
+            color: #98a2b3;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .sync-subtitle-source {
+            min-height: 24px;
+            color: #d0d5dd;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 6px;
+        }
+
+        .sync-subtitle-translated {
+            min-height: 34px;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.55;
+        }
+
+        .sync-subtitle-debug {
+            display: none;
+            margin-top: 8px;
+            color: #98a2b3;
+            font-size: 12px;
+        }
+
+        .subtitle-source {
+            margin-top: 8px;
+            color: #344054;
+            line-height: 1.6;
+        }
+
+        .subtitle-translated {
+            margin-top: 6px;
+            color: #101828;
+            line-height: 1.7;
+            font-weight: 700;
+        }
+
+        .subtitle-translated.pending {
+            color: #98a2b3;
+            font-weight: 500;
+        }
+        
+        .highlight-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .highlight-desc {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .panel-header h2 {
+            margin: 0;
+        }
+        
+        .lang-switch {
+            display: flex;
+            gap: 5px;
+            background: white;
+            padding: 5px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: #666;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lang-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #667eea;
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+        }
+        
+        .lang-btn:hover {
+            background: #f0f2ff;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .lang-btn:hover::after {
+            width: 80%;
+        }
+        
+        .lang-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .lang-btn.active::after {
+            display: none;
+        }
+        
+        /* 视频播放器出现动画 */
+        .video-player {
+            animation: videoAppear 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        @keyframes videoAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotateX(-15deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotateX(0);
+            }
+        }
+        
+        /* 状态消息动画 */
+        .status {
+            animation: statusSlide 0.5s ease-out;
+        }
+        
+        @keyframes statusSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 语言切换按钮组动画 */
+        .lang-switch {
+            animation: switchFadeIn 0.6s ease-out;
+        }
+        
+        @keyframes switchFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* 时间标签脉冲效果 */
+        .time-tag {
+            animation: tagPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes tagPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+        }
+        
+        /* 高光标题闪烁效果 */
+        .highlight-title {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight-title::after {
+            content: '✨';
+            position: absolute;
+            right: -25px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            animation: sparkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: translateY(-50%) scale(0.5); }
+            50% { opacity: 1; transform: translateY(-50%) scale(1); }
+        }
+        
+        /* 加载进度条 */
+        .loading-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 100%;
+            animation: loadingProgress 2s ease-in-out infinite;
+            z-index: 9999;
+        }
+        
+        @keyframes loadingProgress {
+            0% { width: 0%; background-position: 0% 50%; }
+            50% { width: 70%; background-position: 100% 50%; }
+            100% { width: 100%; background-position: 0% 50%; }
+        }
+        
+        /* 浮动粒子效果 */
+        .floating-particle {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp 15s linear infinite;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        /* 结果区域渐进式显示 */
+        .video-section {
+            animation: sectionReveal 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        @keyframes sectionReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(50px);
+                filter: blur(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                filter: blur(0);
+            }
+        }
+        
+        /* 字幕项依次出现 */
+        .subtitle-item {
+            animation: itemSlideIn 0.5s ease-out backwards;
+        }
+        
+        .subtitle-item:nth-child(1) { animation-delay: 0.1s; }
+        .subtitle-item:nth-child(2) { animation-delay: 0.15s; }
+        .subtitle-item:nth-child(3) { animation-delay: 0.2s; }
+        .subtitle-item:nth-child(4) { animation-delay: 0.25s; }
+        .subtitle-item:nth-child(5) { animation-delay: 0.3s; }
+        
+        @keyframes itemSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* 高光项依次出现 */
+        .highlight-item {
+            animation: itemZoomIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+        }
+        
+        .highlight-item:nth-child(1) { animation-delay: 0.2s; }
+        .highlight-item:nth-child(2) { animation-delay: 0.35s; }
+        .highlight-item:nth-child(3) { animation-delay: 0.5s; }
+        .highlight-item:nth-child(4) { animation-delay: 0.65s; }
+        
+        @keyframes itemZoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotate(-5deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 浮动粒子 -->
+    <div class="floating-particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="floating-particle" style="left: 30%; animation-delay: 3s;"></div>
+    <div class="floating-particle" style="left: 50%; animation-delay: 6s;"></div>
+    <div class="floating-particle" style="left: 70%; animation-delay: 9s;"></div>
+    <div class="floating-particle" style="left: 90%; animation-delay: 12s;"></div>
+    <div class="container">
+        <div class="header">
+            <h1>🎬 视频分析系统</h1>
+            <p>上传视频，自动提取字幕并进行 AI 智能分析</p>
+            <p>预处理同步翻译模式：系统先生成字幕和译文，播放时自动同步显示。</p>
+            <div class="mode-nav">
+                <a class="mode-link active" href="test_frontend.html">高精度视频分析模式</a>
+                <a class="mode-link" href="realtime_demo.html">准实时同传模式 Demo</a>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section">
+                <h2>上传视频文件</h2>
+                
+                <!-- Tab 切换和语言选择 -->
+                <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <input type="file" id="fileInput" accept="video/*" style="display: none;">
+                    <button id="tabLocal" class="upload-btn" style="padding: 12px 35px; min-width: 140px; white-space: nowrap; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="switchTab('local')">📂 本地上传</button>
+                    <button id="tabLink" class="upload-btn" style="padding: 12px 35px; min-width: 140px; white-space: nowrap; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="switchTab('link')">🔗 粘贴链接</button>
+                    <select id="languageSelect" class="language-select" style="margin-left: 20px;">
+                        <option value="auto">🌍 自动检测</option>
+                        <option value="zh">🇨🇳 中文</option>
+                        <option value="en">🇬🇧 英文</option>
+                    </select>
+                </div>
+                
+                <!-- 本地上传区域 -->
+                <div id="localUpload" style="display: none;">
+                    <!-- 本地上传时自动触发文件选择 -->
+                </div>
+                
+                <!-- 链接上传区域 -->
+                <div id="linkUpload" style="display: none;">
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="videoUrlInput" placeholder="粘贴 Bilibili / 抖音 / YouTube 视频链接，粘贴后自动分析..." 
+                               style="flex: 1; padding: 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 10px; background: rgba(255,255,255,0.1); color: white; font-size: 15px;">
+                        <button id="downloadBtn" class="upload-btn" onclick="downloadVideo()" style="padding: 20px 50px; font-size: 16px; white-space: nowrap; display: none;">💾 下载视频</button>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 13px; color: #667eea; text-align: center; font-weight: 500;">
+                        💡 支持 Bilibili、抖音等平台（YouTube 需要代理）| 粘贴链接后自动下载并分析
+                    </div>
+                </div>
+                
+                <div id="status" class="status"></div>
+            </div>
+
+            <div id="devHealthPanel" class="panel" style="display: none; margin-bottom: 30px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap;">
+                    <h2 style="margin-bottom: 0;">🧪 系统自检</h2>
+                    <button class="upload-btn" onclick="runSystemHealthCheck()" style="padding: 12px 28px; font-size: 15px;">运行自检</button>
+                </div>
+                <div id="healthCheckResult" style="margin-top: 15px; color: #666; font-size: 14px;">
+                    点击“运行自检”检查 Python、WhisperX、yt-dlp、ffmpeg、LLM 配置和 H2 数据库。
+                </div>
+            </div>
+            
+            <div id="videoSection" class="video-section">
+                <div class="video-player">
+                    <video id="videoPlayer" controls></video>
+                    <div id="syncSubtitlePanel" class="sync-subtitle-panel">
+                        <div class="sync-subtitle-title">同步双语字幕</div>
+                        <div class="sync-subtitle-hint">系统已预处理字幕翻译，播放时自动跟随视频进度显示。</div>
+                        <div id="syncSourceSubtitle" class="sync-subtitle-source"></div>
+                        <div id="syncTranslatedSubtitle" class="sync-subtitle-translated">等待字幕...</div>
+                        <div id="syncSubtitleDebug" class="sync-subtitle-debug"></div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>📊 视频总结</h2>
+                        <div class="lang-switch">
+                            <button class="lang-btn active" onclick="switchSummaryLanguage('zh')" data-lang="zh">中文</button>
+                            <button class="lang-btn" onclick="switchSummaryLanguage('en')" data-lang="en">English</button>
+                        </div>
+                    </div>
+                    <div id="summary" class="summary-text"></div>
+                </div>
+                
+                <div class="analysis-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>⭐ 高光片段</h2>
+                            <div class="lang-switch">
+                                <button class="lang-btn active" onclick="switchHighlightLanguage('zh')" data-lang="zh">中文</button>
+                                <button class="lang-btn" onclick="switchHighlightLanguage('en')" data-lang="en">English</button>
+                            </div>
+                        </div>
+                        <div id="highlightList" class="highlight-list"></div>
+                    </div>
+
+                    <div class="panel">
+                        <h2>💬 字幕列表</h2>
+                        <div id="subtitleList" class="subtitle-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================================
+        // 配置区域 - 在这里修改后端 API 地址
+        // ============================================================
+        const API_BASE = 'http://localhost:8080/api/video';  // 👈 如需修改后端地址，改这里
+        const DEV_MODE = new URLSearchParams(window.location.search).get('debug') === '1';
+        const SUBTITLE_SYNC_TOLERANCE_SEC = 0.25;
+        const MAX_DISPLAY_SUBTITLE_DURATION_SEC = 7;
+        const MAX_DISPLAY_SUBTITLE_CHARS = 150;
+        // 
+        // 说明：
+        // - 如果修改了后端服务端口（application.yml 中的 server.port）
+        //   需要同步修改上面的 API_BASE
+        // 
+        // 示例：
+        // - 端口改为 8081: const API_BASE = 'http://localhost:8081/api/video';
+        // - 部署到服务器: const API_BASE = 'http://your-server.com:8080/api/video';
+        // ============================================================
+        
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('status');
+        const videoSection = document.getElementById('videoSection');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const summaryDiv = document.getElementById('summary');
+        const subtitleList = document.getElementById('subtitleList');
+        const highlightList = document.getElementById('highlightList');
+        const syncSourceSubtitle = document.getElementById('syncSourceSubtitle');
+        const syncTranslatedSubtitle = document.getElementById('syncTranslatedSubtitle');
+        const syncSubtitleDebug = document.getElementById('syncSubtitleDebug');
+        const languageSelect = document.getElementById('languageSelect');
+        const healthCheckResult = document.getElementById('healthCheckResult');
+        const devHealthPanel = document.getElementById('devHealthPanel');
+
+        if (DEV_MODE && devHealthPanel) {
+            devHealthPanel.style.display = 'block';
+        }
+        
+        // 测试后端连接
+        fetch('http://localhost:8080/api/test/ping')
+            .then(res => res.text())
+            .then(data => console.log('后端连接正常:', data))
+            .catch(err => {
+                console.error('后端连接失败:', err);
+                showStatus('⚠️ 无法连接到后端服务，请确保 Java 服务正在运行', 'error');
+            });
+        
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            
+            // 添加加载进度条
+            if (type === 'loading' || type === 'info') {
+                if (!document.querySelector('.loading-bar')) {
+                    const loadingBar = document.createElement('div');
+                    loadingBar.className = 'loading-bar';
+                    document.body.appendChild(loadingBar);
+                }
+            } else {
+                const loadingBar = document.querySelector('.loading-bar');
+                if (loadingBar) {
+                    loadingBar.style.width = '100%';
+                    setTimeout(() => loadingBar.remove(), 500);
+                }
+            }
+        }
+
+        function getTaskStatus(data) {
+            return ((data && data.status) || '').toLowerCase();
+        }
+
+        function isCompletedTask(data) {
+            const status = getTaskStatus(data);
+            if (status) {
+                return status === 'completed';
+            }
+            return data && data.summary && !data.summary.includes('处理中') && !data.summary.includes('失败');
+        }
+
+        function isFailedTask(data) {
+            const status = getTaskStatus(data);
+            if (status) {
+                return status === 'failed';
+            }
+            return data && data.summary && data.summary.includes('失败');
+        }
+
+        function getProgressValue(data) {
+            const progress = Number(data && data.progress);
+            return Number.isFinite(progress) ? Math.round(progress) : null;
+        }
+
+        function getProgressSuffix(data) {
+            if (!DEV_MODE) {
+                return '';
+            }
+            const progress = getProgressValue(data);
+            return progress !== null && progress >= 0 ? `（${progress}%）` : '';
+        }
+
+        function getStageText(data) {
+            return (data && data.stage) || '视频正在处理中';
+        }
+
+        function getFailureMessage(data) {
+            const rawMessage = (data && (data.errorMessage || data.summary)) || '处理失败，请稍后重试';
+            return simplifyFailureMessage(String(rawMessage).replace(/^处理失败[:：]\s*/, ''));
+        }
+
+        function simplifyFailureMessage(message) {
+            const lower = String(message || '').toLowerCase();
+            if (lower.includes('sign in to confirm') || lower.includes('not a bot')
+                || lower.includes('too many requests') || lower.includes('http error 429')
+                || lower.includes('youtube 触发了访问风控')) {
+                return 'YouTube 触发了访问风控，需要稍后重试，或让本机浏览器登录 YouTube 后再配置 cookies。';
+            }
+            if (lower.includes('no supported javascript runtime')) {
+                return 'YouTube 解析需要 JavaScript runtime，请安装 Node.js 或 Deno 后重试。';
+            }
+            if (lower.includes('没有音轨') || lower.includes('failed to load audio')) {
+                return '下载的视频没有可用音轨，无法提取字幕。请换一个链接或重新下载。';
+            }
+            if (message.length > 220) {
+                return message.substring(0, 220) + '...';
+            }
+            return message;
+        }
+
+        function formatDuration(ms) {
+            const value = Number(ms);
+            if (!Number.isFinite(value) || value <= 0) {
+                return '未记录';
+            }
+            if (value < 1000) {
+                return `${Math.round(value)} ms`;
+            }
+
+            const totalSeconds = Math.round(value / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            if (minutes > 0) {
+                return `${minutes} 分 ${seconds} 秒`;
+            }
+            return `${seconds} 秒`;
+        }
+
+        function buildDurationHtml(data) {
+            if (!DEV_MODE) {
+                return '';
+            }
+            const items = [
+                ['下载', data && data.downloadDurationMs],
+                ['字幕', data && data.subtitleDurationMs],
+                ['对齐', data && data.alignDurationMs],
+                ['AI 分析', data && data.analysisDurationMs],
+                ['总耗时', data && data.totalDurationMs]
+            ];
+            const recordedItems = items.filter(([, value]) => {
+                const numeric = Number(value);
+                return Number.isFinite(numeric) && numeric > 0;
+            });
+
+            if (recordedItems.length === 0) {
+                return `
+                    <div style="margin-top: 18px; padding: 16px; background: #f8f9ff; border-radius: 12px; border: 1px solid #e0e5ff;">
+                        <div style="font-weight: bold; color: #667eea; margin-bottom: 8px;">处理耗时</div>
+                        <div style="color: #666; font-size: 14px;">当前结果没有耗时记录，通常是历史缓存结果，或任务在进入计时阶段前失败。</div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div style="margin-top: 18px; padding: 16px; background: #f8f9ff; border-radius: 12px; border: 1px solid #e0e5ff;">
+                    <div style="font-weight: bold; color: #667eea; margin-bottom: 10px;">处理耗时</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px;">
+                        ${recordedItems.map(([label, value]) => `
+                            <div style="background: white; padding: 10px; border-radius: 10px;">
+                                <div style="font-size: 12px; color: #888;">${escapeHtml(label)}</div>
+                                <div style="font-size: 14px; color: #333; font-weight: 600;">${escapeHtml(formatDuration(value))}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function runSystemHealthCheck() {
+            healthCheckResult.innerHTML = '<div style="color: #667eea;">正在执行系统自检...</div>';
+            try {
+                const response = await fetch('http://localhost:8080/api/test/health/full');
+                if (!response.ok) {
+                    throw new Error(`自检失败 (${response.status})`);
+                }
+                const data = await response.json();
+                const checks = Array.isArray(data.checks) ? data.checks : [];
+                healthCheckResult.innerHTML = `
+                    <div style="margin-bottom: 10px; font-weight: bold; color: ${data.ok ? '#2e7d32' : '#c62828'};">
+                        ${data.ok ? '✓ 自检通过' : '✗ 自检发现问题'}
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px;">
+                        ${checks.map(check => `
+                            <div style="padding: 12px; border-radius: 10px; background: ${check.ok ? '#f1f8e9' : '#ffebee'}; border: 1px solid ${check.ok ? '#c5e1a5' : '#ffcdd2'};">
+                                <div style="font-weight: bold; color: ${check.ok ? '#2e7d32' : '#c62828'};">
+                                    ${check.ok ? '✓' : '✗'} ${escapeHtml(check.name)}
+                                </div>
+                                <div style="margin-top: 6px; color: #555; word-break: break-word;">${escapeHtml(check.message)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                console.error('系统自检失败:', error);
+                healthCheckResult.innerHTML = `<div style="color: #c62828;">系统自检失败：${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function clearPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
+
+        function updateProcessingStatus(data) {
+            const stage = getStageText(data);
+            showStatus(`⏳ ${stage}${getProgressSuffix(data)}，请稍候...`, 'info');
+        }
+
+        function showFailureState(data) {
+            const message = getFailureMessage(data);
+            showStatus(`✗ 处理失败：${message}`, 'error');
+
+            if (data && data.videoId) {
+                videoSection.style.display = 'block';
+                summaryDiv.innerHTML = `
+                    <div style="color: #f44336;">处理失败：${escapeHtml(message)}</div>
+                    ${buildDurationHtml(data)}
+                `;
+                subtitleList.innerHTML = '<p>暂无字幕</p>';
+                highlightList.innerHTML = '<p>暂无高光片段</p>';
+                videoSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function handleTaskResponse(data) {
+            if (!data) {
+                showStatus('✗ 后端响应为空，请稍后重试', 'error');
+                return;
+            }
+
+            if (isCompletedTask(data)) {
+                clearPolling();
+                showStatus('✓ 分析完成！', 'success');
+                displayResults(data);
+                return;
+            }
+
+            if (isFailedTask(data)) {
+                clearPolling();
+                if (data.videoUrl) {
+                    showVideoPlayer(data.videoUrl);
+                }
+                showFailureState(data);
+                return;
+            }
+
+            if (data.videoUrl) {
+                showVideoPlayer(data.videoUrl);
+            } else {
+                videoSection.style.display = 'block';
+                videoSection.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            showProcessingState(data);
+            updateProcessingStatus(data);
+
+            if (data.videoId) {
+                startPolling(data.videoId);
+            }
+        }
+        
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            currentVideoUrl = null;
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                downloadBtn.style.display = 'none';
+            }
+            showStatus('正在上传视频并分析，请稍候...', 'loading');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('language', languageSelect.value);
+            
+            try {
+                // 创建一个 AbortController 用于超时控制
+                const controller = new AbortController();
+                const response = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    body: formData,
+                    signal: AbortSignal.timeout(900000) // 15分钟超时
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('上传失败:', errorText);
+                    throw new Error(`上传失败 (${response.status}): ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('上传响应数据:', data);
+                handleTaskResponse(data);
+            } catch (error) {
+                console.error('错误详情:', error);
+                showStatus('✗ 上传失败: ' + error.message, 'error');
+            }
+        }
+        
+        function showVideoPlayer(videoUrl) {
+            videoSection.style.display = 'block';
+            currentVideoUrl = videoUrl;
+
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                downloadBtn.style.display = 'block';
+            }
+            
+            const fullVideoUrl = videoUrl.startsWith('http') ? videoUrl : API_BASE + videoUrl;
+            console.log('显示视频播放器:', fullVideoUrl);
+
+            while (videoPlayer.firstChild) {
+                videoPlayer.removeChild(videoPlayer.firstChild);
+            }
+
+            const source = document.createElement('source');
+            source.src = fullVideoUrl;
+            source.type = 'video/mp4';
+            videoPlayer.appendChild(source);
+            videoPlayer.load();
+            
+            videoSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function showProcessingState(data = {}) {
+            const status = getTaskStatus(data);
+            const stage = getStageText(data);
+            const submitStep = status === 'downloading' ? '⟳ 正在下载视频...' : '✓ 视频已提交';
+            const subtitleStep = status === 'extracting_subtitle'
+                ? '⟳ 正在提取字幕...'
+                : (status === 'analyzing' || status === 'completed' ? '✓ 字幕提取完成' : '○ 等待字幕提取');
+            const aiStep = status === 'analyzing'
+                ? '⟳ 正在调用 AI 分析...'
+                : (status === 'completed' ? '✓ AI 分析完成' : '○ 等待 AI 分析');
+
+            // 总结区域 - 带脉冲动画的加载效果
+            summaryDiv.innerHTML = `
+                <div style="text-align: center; padding: 50px;">
+                    <div style="position: relative; display: inline-block;">
+                        <div style="width: 80px; height: 80px; border: 4px solid #667eea; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px;">🤖</div>
+                    </div>
+                    <div style="margin-top: 30px; font-size: 22px; font-weight: bold; color: #667eea;">${escapeHtml(stage)}</div>
+                    <div style="margin-top: 15px; color: #999; font-size: 14px;">
+                        <div style="margin-bottom: 8px;">${escapeHtml(submitStep)}</div>
+                        <div style="margin-bottom: 8px; color: #667eea; font-weight: bold;">${escapeHtml(subtitleStep)}</div>
+                        <div style="color: #ccc;">${escapeHtml(aiStep)}</div>
+                    </div>
+                    <div style="margin-top: 20px; padding: 15px; background: #f0f2ff; border-radius: 10px; color: #667eea; font-size: 13px;">
+                        💡 正在后台处理，长视频可能需要几分钟。您可以先观看视频，结果会自动显示。
+                    </div>
+                    ${buildDurationHtml(data)}
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                    }
+                </style>
+            `;
+            
+            // 字幕区域 - 带波浪动画
+            subtitleList.innerHTML = `
+                <div style="text-align: center; padding: 60px 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px; animation: pulse 2s ease-in-out infinite;">📝</div>
+                    <div style="font-size: 18px; color: #666; font-weight: 500;">${escapeHtml(stage)}</div>
+                    <div style="margin-top: 15px; display: flex; justify-content: center; gap: 8px;">
+                        <div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: bounce 1.4s ease-in-out infinite;"></div>
+                        <div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: bounce 1.4s ease-in-out 0.2s infinite;"></div>
+                        <div style="width: 8px; height: 8px; background: #667eea; border-radius: 50%; animation: bounce 1.4s ease-in-out 0.4s infinite;"></div>
+                    </div>
+                </div>
+                <style>
+                    @keyframes bounce {
+                        0%, 80%, 100% { transform: translateY(0); }
+                        40% { transform: translateY(-15px); }
+                    }
+                </style>
+            `;
+            
+            // 高光片段区域 - 带闪烁动画
+            highlightList.innerHTML = `
+                <div style="text-align: center; padding: 60px 40px;">
+                    <div style="font-size: 48px; margin-bottom: 20px; animation: pulse 2s ease-in-out infinite;">✨</div>
+                    <div style="font-size: 18px; color: #666; font-weight: 500;">高光片段分析中</div>
+                    <div style="margin-top: 15px; color: #999; font-size: 13px;">${escapeHtml(stage)}</div>
+                </div>
+            `;
+        }
+        
+        let pollingInterval = null;
+        
+        function startPolling(videoId) {
+            console.log('开始轮询视频状态，ID:', videoId);
+            
+            // 清除之前的轮询
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+            
+            // 每3秒检查一次
+            pollingInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/analysis/${videoId}`);
+                    if (!response.ok) {
+                        throw new Error('查询失败');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('轮询结果:', data);
+                    
+                    if (isCompletedTask(data)) {
+                        clearPolling();
+                        showStatus('✓ 分析完成！', 'success');
+                        displayResults(data);
+                    } else if (isFailedTask(data)) {
+                        clearPolling();
+                        showFailureState(data);
+                    } else {
+                        if (data.videoUrl && data.videoUrl !== currentVideoUrl) {
+                            showVideoPlayer(data.videoUrl);
+                        }
+                        showProcessingState(data);
+                        updateProcessingStatus(data);
+                    }
+                } catch (error) {
+                    console.error('轮询错误:', error);
+                }
+            }, 3000);
+        }
+        
+        function displayResults(data) {
+            videoSection.style.display = 'block';
+            
+            // 保存当前视频ID，用于语言切换
+            currentVideoId = data.videoId;
+            analysisLanguageCache = { zh: data };
+            analysisLanguageRequests = {};
+            
+            // 重置所有语言切换按钮为中文状态
+            resetLanguageButtons();
+            
+            if (data.videoUrl) {
+                currentVideoUrl = data.videoUrl;
+                const downloadBtn = document.getElementById('downloadBtn');
+                if (downloadBtn) {
+                    downloadBtn.style.display = 'block';
+                }
+
+                // 修复视频 URL
+                const videoUrl = data.videoUrl.startsWith('http') ? data.videoUrl : API_BASE + data.videoUrl;
+                console.log('视频 URL:', videoUrl);
+
+                // 移除旧的 source 标签（如果有）
+                while (videoPlayer.firstChild) {
+                    videoPlayer.removeChild(videoPlayer.firstChild);
+                }
+
+                // 创建并添加新的 source 标签
+                const source = document.createElement('source');
+                source.src = videoUrl;
+                source.type = 'video/mp4';
+                videoPlayer.appendChild(source);
+
+                videoPlayer.load(); // 强制重新加载视频
+            } else {
+                console.warn('完成响应缺少 videoUrl，跳过播放器刷新');
+            }
+            
+            summaryDiv.innerHTML = `
+                <div>${escapeHtml(data.summary || '暂无总结')}</div>
+                ${buildDurationHtml(data)}
+            `;
+            
+            currentSubtitles = normalizeSubtitleSegments(data.subtitles || []);
+            renderSubtitleList(currentSubtitles);
+            updateSynchronizedSubtitle();
+            
+            highlightList.innerHTML = '';
+            if (data.highlights && data.highlights.length > 0) {
+                data.highlights.forEach(highlight => {
+                    const item = document.createElement('div');
+                    item.className = 'highlight-item';
+                    item.innerHTML = `
+                        <div class="highlight-title">${highlight.title}</div>
+                        <span class="time-tag">${formatTime(highlight.start)} - ${formatTime(highlight.end)}</span>
+                        <div class="highlight-desc">${highlight.description}</div>
+                    `;
+                    item.onclick = (e) => seekTo(highlight.start, e);
+                    highlightList.appendChild(item);
+                });
+            } else {
+                highlightList.innerHTML = '<p>暂无高光片段</p>';
+            }
+            
+            videoSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function renderSummary(data) {
+            summaryDiv.innerHTML = `
+                <div>${escapeHtml(data.summary || '暂无总结')}</div>
+                ${buildDurationHtml(data)}
+            `;
+        }
+
+        function renderHighlights(data) {
+            highlightList.innerHTML = '';
+            if (data.highlights && data.highlights.length > 0) {
+                data.highlights.forEach(highlight => {
+                    const item = document.createElement('div');
+                    item.className = 'highlight-item';
+                    item.innerHTML = `
+                        <div class="highlight-title">${escapeHtml(highlight.title || '')}</div>
+                        <span class="time-tag">${formatTime(highlight.start)} - ${formatTime(highlight.end)}</span>
+                        <div class="highlight-desc">${escapeHtml(highlight.description || '')}</div>
+                    `;
+                    item.onclick = (e) => seekTo(highlight.start, e);
+                    highlightList.appendChild(item);
+                });
+            } else {
+                highlightList.innerHTML = '<p>暂无高光片段</p>';
+            }
+        }
+
+        function normalizeSubtitleSegments(subtitles) {
+            const normalized = (subtitles || [])
+                .map(subtitle => {
+                    const sourceText = subtitle.sourceText || subtitle.text || '';
+                    const translatedText = subtitle.translatedText || '';
+                    return {
+                        start: Number(subtitle.start) || 0,
+                        end: Number(subtitle.end) || 0,
+                        text: sourceText,
+                        sourceText,
+                        translatedText
+                    };
+                })
+                .filter(subtitle => subtitle.end >= subtitle.start)
+                .sort((a, b) => a.start - b.start || a.end - b.end);
+
+            return expandLongSubtitleSegments(normalized);
+        }
+
+        function expandLongSubtitleSegments(subtitles) {
+            const expanded = [];
+            subtitles.forEach(subtitle => {
+                splitLongSubtitleSegment(subtitle).forEach(item => expanded.push(item));
+            });
+            return expanded.sort((a, b) => a.start - b.start || a.end - b.end);
+        }
+
+        function splitLongSubtitleSegment(subtitle) {
+            const duration = Math.max(0, subtitle.end - subtitle.start);
+            const sourceText = String(subtitle.sourceText || subtitle.text || '').trim();
+            const translatedText = String(subtitle.translatedText || '').trim();
+            const textLength = Math.max(sourceText.length, translatedText.length);
+
+            if (duration <= MAX_DISPLAY_SUBTITLE_DURATION_SEC && textLength <= MAX_DISPLAY_SUBTITLE_CHARS) {
+                return [subtitle];
+            }
+
+            const sourceParts = splitTextIntoDisplayParts(sourceText);
+            if (sourceParts.length <= 1) {
+                return [subtitle];
+            }
+
+            const translatedParts = alignTextParts(
+                splitTextIntoDisplayParts(translatedText),
+                translatedText,
+                sourceParts.length
+            );
+            const weights = sourceParts.map(part => Math.max(1, part.replace(/\s+/g, '').length));
+            const totalWeight = weights.reduce((sum, value) => sum + value, 0) || sourceParts.length;
+
+            let consumedWeight = 0;
+            return sourceParts.map((part, index) => {
+                const startRatio = consumedWeight / totalWeight;
+                consumedWeight += weights[index];
+                const endRatio = consumedWeight / totalWeight;
+                const start = subtitle.start + duration * startRatio;
+                const end = index === sourceParts.length - 1
+                    ? subtitle.end
+                    : subtitle.start + duration * endRatio;
+                const sourcePart = part.trim();
+                const translatedPart = (translatedParts[index] || '').trim();
+                return {
+                    start,
+                    end: Math.max(start + 0.1, end),
+                    text: sourcePart,
+                    sourceText: sourcePart,
+                    translatedText: translatedPart || translatedText
+                };
+            });
+        }
+
+        function splitTextIntoDisplayParts(text) {
+            const normalized = String(text || '').trim().replace(/\s+/g, ' ');
+            if (!normalized) {
+                return [];
+            }
+
+            const sentenceParts = normalized
+                .match(/[^.!?。！？；;]+[.!?。！？；;]*/g);
+            if (sentenceParts && sentenceParts.length > 1) {
+                return mergeDisplayParts(sentenceParts);
+            }
+
+            const commaParts = normalized
+                .match(/[^,，、]+[,，、]*/g);
+            if (commaParts && commaParts.length > 1 && normalized.length > MAX_DISPLAY_SUBTITLE_CHARS) {
+                return mergeDisplayParts(commaParts);
+            }
+
+            if (normalized.length <= MAX_DISPLAY_SUBTITLE_CHARS) {
+                return [normalized];
+            }
+
+            return splitTextByLength(normalized, Math.ceil(normalized.length / MAX_DISPLAY_SUBTITLE_CHARS));
+        }
+
+        function mergeDisplayParts(parts) {
+            const result = [];
+            let buffer = '';
+            parts
+                .map(part => String(part || '').trim())
+                .filter(Boolean)
+                .forEach(part => {
+                    const next = buffer ? `${buffer} ${part}` : part;
+                    if (buffer && next.length > MAX_DISPLAY_SUBTITLE_CHARS) {
+                        result.push(buffer);
+                        buffer = part;
+                    } else {
+                        buffer = next;
+                    }
+                });
+            if (buffer) {
+                result.push(buffer);
+            }
+            return result.length > 0 ? result : parts;
+        }
+
+        function alignTextParts(parts, originalText, targetCount) {
+            const cleanedParts = (parts || []).map(part => String(part || '').trim()).filter(Boolean);
+            const original = String(originalText || '').trim();
+            if (targetCount <= 1) {
+                return [original];
+            }
+            if (!original) {
+                return new Array(targetCount).fill('');
+            }
+            if (cleanedParts.length === targetCount) {
+                return cleanedParts;
+            }
+            if (cleanedParts.length > targetCount) {
+                const grouped = [];
+                for (let i = 0; i < targetCount; i++) {
+                    const start = Math.floor(i * cleanedParts.length / targetCount);
+                    const end = Math.floor((i + 1) * cleanedParts.length / targetCount);
+                    grouped.push(cleanedParts.slice(start, Math.max(start + 1, end)).join(' '));
+                }
+                return grouped;
+            }
+            return splitTextByLength(original, targetCount);
+        }
+
+        function splitTextByLength(text, count) {
+            const normalized = String(text || '').trim();
+            if (!normalized || count <= 1) {
+                return normalized ? [normalized] : [];
+            }
+
+            const result = [];
+            const hasSpaces = /\s/.test(normalized);
+            if (hasSpaces) {
+                const words = normalized.split(/\s+/).filter(Boolean);
+                for (let i = 0; i < count; i++) {
+                    const start = Math.floor(i * words.length / count);
+                    const end = Math.floor((i + 1) * words.length / count);
+                    result.push(words.slice(start, Math.max(start + 1, end)).join(' '));
+                }
+                return result.filter(Boolean);
+            }
+
+            for (let i = 0; i < count; i++) {
+                const start = Math.floor(i * normalized.length / count);
+                const end = Math.floor((i + 1) * normalized.length / count);
+                result.push(normalized.slice(start, Math.max(start + 1, end)));
+            }
+            return result.filter(Boolean);
+        }
+
+        function normalizeForCompare(text) {
+            return String(text || '').trim().replace(/\s+/g, ' ').toLowerCase();
+        }
+
+        function containsChinese(text) {
+            return /[\u3400-\u9fff]/.test(String(text || ''));
+        }
+
+        function hasRealChineseTranslation(subtitle) {
+            const sourceText = subtitle && (subtitle.sourceText || subtitle.text || '');
+            const translatedText = subtitle && subtitle.translatedText;
+            if (!translatedText || !String(translatedText).trim()) {
+                return false;
+            }
+            return normalizeForCompare(sourceText) !== normalizeForCompare(translatedText);
+        }
+
+        function translationFallbackText(subtitle) {
+            const sourceText = subtitle && (subtitle.sourceText || subtitle.text || '');
+            return containsChinese(sourceText) ? '原文已是中文' : '中文字幕待生成';
+        }
+
+        function renderSubtitleList(subtitles) {
+            subtitleList.innerHTML = '';
+            if (subtitles && subtitles.length > 0) {
+                subtitles.forEach(subtitle => {
+                    const item = document.createElement('div');
+                    item.className = 'subtitle-item';
+                    const hasTranslation = hasRealChineseTranslation(subtitle);
+                    const translatedHtml = hasTranslation
+                        ? `<div class="subtitle-translated">${escapeHtml(subtitle.translatedText)}</div>`
+                        : `<div class="subtitle-translated pending">${escapeHtml(translationFallbackText(subtitle))}</div>`;
+                    item.innerHTML = `
+                        <span class="time-tag">${formatTime(subtitle.start)} - ${formatTime(subtitle.end)}</span>
+                        <div class="subtitle-source">${escapeHtml(subtitle.sourceText || '')}</div>
+                        ${translatedHtml}
+                    `;
+                    item.onclick = (e) => seekTo(subtitle.start, e);
+                    subtitleList.appendChild(item);
+                });
+            } else {
+                subtitleList.innerHTML = '<p>暂无字幕</p>';
+            }
+        }
+
+        function updateSynchronizedSubtitle() {
+            if (!syncSourceSubtitle || !syncTranslatedSubtitle) {
+                return;
+            }
+
+            if (!currentSubtitles || currentSubtitles.length === 0) {
+                syncSourceSubtitle.textContent = '';
+                syncTranslatedSubtitle.textContent = '等待字幕...';
+                if (syncSubtitleDebug) {
+                    syncSubtitleDebug.style.display = 'none';
+                    syncSubtitleDebug.textContent = '';
+                }
+                return;
+            }
+
+            const currentTime = Number(videoPlayer.currentTime) || 0;
+            const currentSubtitle = currentSubtitles.find(subtitle =>
+                currentTime + SUBTITLE_SYNC_TOLERANCE_SEC >= subtitle.start
+                    && currentTime - SUBTITLE_SYNC_TOLERANCE_SEC <= subtitle.end
+            );
+
+            if (!currentSubtitle) {
+                syncSourceSubtitle.textContent = '';
+                syncTranslatedSubtitle.textContent = '';
+                if (syncSubtitleDebug) {
+                    syncSubtitleDebug.style.display = DEV_MODE ? 'block' : 'none';
+                    syncSubtitleDebug.textContent = DEV_MODE ? `currentTime=${currentTime.toFixed(2)}，当前无字幕` : '';
+                }
+                return;
+            }
+
+            syncSourceSubtitle.textContent = currentSubtitle.sourceText || currentSubtitle.text || '';
+            syncTranslatedSubtitle.textContent = hasRealChineseTranslation(currentSubtitle)
+                ? currentSubtitle.translatedText
+                : translationFallbackText(currentSubtitle);
+            if (syncSubtitleDebug) {
+                syncSubtitleDebug.style.display = DEV_MODE ? 'block' : 'none';
+                syncSubtitleDebug.textContent = DEV_MODE
+                    ? `currentTime=${currentTime.toFixed(2)}，start=${currentSubtitle.start.toFixed(2)}，end=${currentSubtitle.end.toFixed(2)}`
+                    : '';
+            }
+        }
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function seekTo(time, event) {
+            console.log('跳转到时间:', time);
+            videoPlayer.currentTime = time;
+            if (videoPlayer.paused) {
+                videoPlayer.play().catch(e => console.error('播放失败:', e));
+            }
+            
+            // 高亮当前字幕
+            if (event) {
+                document.querySelectorAll('.subtitle-item').forEach(item => {
+                    item.style.backgroundColor = '';
+                });
+                event.currentTarget.style.backgroundColor = '#e3f2fd';
+            }
+        }
+        
+        // 存储当前视频ID和字幕数据
+        let currentVideoId = null;
+        let currentSubtitleText = null;
+        let currentSubtitles = [];
+        let analysisLanguageCache = {};
+        let analysisLanguageRequests = {};
+
+        videoPlayer.addEventListener('timeupdate', updateSynchronizedSubtitle);
+        videoPlayer.addEventListener('seeked', updateSynchronizedSubtitle);
+
+        async function getAnalysisByLanguage(lang) {
+            if (analysisLanguageCache[lang]) {
+                return analysisLanguageCache[lang];
+            }
+            if (analysisLanguageRequests[lang]) {
+                return analysisLanguageRequests[lang];
+            }
+
+            analysisLanguageRequests[lang] = fetch(`${API_BASE}/reanalyze/${currentVideoId}?language=${lang}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('切换失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    analysisLanguageCache[lang] = data;
+                    return data;
+                })
+                .finally(() => {
+                    delete analysisLanguageRequests[lang];
+                });
+
+            return analysisLanguageRequests[lang];
+        }
+        
+        // 重置所有语言切换按钮为中文状态
+        function resetLanguageButtons() {
+            // 重置视频总结的语言按钮
+            document.querySelectorAll('.panel-header .lang-switch').forEach((switchGroup, index) => {
+                const buttons = switchGroup.querySelectorAll('.lang-btn');
+                buttons.forEach(btn => {
+                    const lang = btn.getAttribute('data-lang');
+                    if (lang === 'zh') {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            });
+            console.log('语言按钮已重置为中文');
+        }
+        
+        // 切换总结语言
+        async function switchSummaryLanguage(lang) {
+            if (!currentVideoId) return;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.panel-header .lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === lang && btn.onclick.toString().includes('Summary')) {
+                    btn.classList.add('active');
+                } else if (btn.onclick.toString().includes('Summary')) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // 显示加载状态
+            summaryDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: #667eea;"><div style="font-size: 32px; margin-bottom: 15px;">⏳</div><div>正在切换语言...</div></div>';
+            
+            try {
+                const data = await getAnalysisByLanguage(lang);
+                renderSummary(data);
+            } catch (error) {
+                console.error('切换语言失败:', error);
+                summaryDiv.innerHTML = '<div style="color: #f44336;">切换失败，请重试</div>';
+            }
+        }
+        
+        // 切换高光语言
+        async function switchHighlightLanguage(lang) {
+            if (!currentVideoId) return;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.panel-header .lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === lang && btn.onclick.toString().includes('Highlight')) {
+                    btn.classList.add('active');
+                } else if (btn.onclick.toString().includes('Highlight')) {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // 显示加载状态
+            highlightList.innerHTML = '<div style="text-align: center; padding: 40px; color: #667eea;"><div style="font-size: 32px; margin-bottom: 15px;">⏳</div><div>正在切换语言...</div></div>';
+            
+            try {
+                const data = await getAnalysisByLanguage(lang);
+                renderHighlights(data);
+            } catch (error) {
+                console.error('切换语言失败:', error);
+                highlightList.innerHTML = '<div style="color: #f44336;">切换失败，请重试</div>';
+            }
+        }
+        
+        // ============================================================
+        // 新增：Tab 切换功能
+        // ============================================================
+        function switchTab(tab) {
+            const localUpload = document.getElementById('localUpload');
+            const linkUpload = document.getElementById('linkUpload');
+            
+            if (tab === 'local') {
+                // 本地上传：直接触发文件选择
+                document.getElementById('fileInput').click();
+                localUpload.style.display = 'none';
+                linkUpload.style.display = 'none';
+            } else {
+                // 链接上传：显示输入框
+                localUpload.style.display = 'none';
+                linkUpload.style.display = 'block';
+            }
+            // 不改变按钮颜色，保持一致
+        }
+        
+        // ============================================================
+        // 新增：通过链接上传功能
+        // ============================================================
+        let currentVideoUrl = null; // 保存当前视频的 URL
+        
+        // 监听输入框粘贴事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoUrlInput = document.getElementById('videoUrlInput');
+            
+            // 监听粘贴事件
+            videoUrlInput.addEventListener('paste', function(e) {
+                setTimeout(() => {
+                    const url = videoUrlInput.value.trim();
+                    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                        uploadByLink();
+                    }
+                }, 100);
+            });
+            
+            // 监听回车事件
+            videoUrlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const url = videoUrlInput.value.trim();
+                    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                        uploadByLink();
+                    }
+                }
+            });
+        });
+        
+        async function uploadByLink() {
+            const videoUrlInput = document.getElementById('videoUrlInput');
+            const videoUrl = videoUrlInput.value.trim();
+            const language = document.getElementById('languageSelect').value;
+            
+            if (!videoUrl) {
+                showStatus('⚠️ 请输入视频链接', 'error');
+                return;
+            }
+            
+            // 简单的 URL 验证
+            if (!videoUrl.startsWith('http://') && !videoUrl.startsWith('https://')) {
+                showStatus('⚠️ 请输入有效的 URL（以 http:// 或 https:// 开头）', 'error');
+                return;
+            }
+            
+            // 清空输入框，防止重复提交
+            videoUrlInput.value = '';
+            currentVideoUrl = null;
+            const downloadBtn = document.getElementById('downloadBtn');
+            if (downloadBtn) {
+                downloadBtn.style.display = 'none';
+            }
+            
+            showStatus('🌐 正在下载视频并分析，请稍候...', 'loading');
+            
+            try {
+                const response = await fetch(`${API_BASE}/upload-url`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        url: videoUrl,
+                        language: language
+                    }),
+                    signal: AbortSignal.timeout(900000) // 15分钟超时
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('下载失败:', errorText);
+                    throw new Error(`下载失败 (${response.status}): ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('链接上传响应数据:', data);
+                
+                // 保存视频 URL 用于下载
+                if (data.videoUrl) {
+                    currentVideoUrl = data.videoUrl;
+                    // 显示下载按钮
+                    document.getElementById('downloadBtn').style.display = 'block';
+                }
+                
+                handleTaskResponse(data);
+            } catch (error) {
+                console.error('错误详情:', error);
+                showStatus('✗ 下载或分析失败: ' + error.message, 'error');
+            }
+        }
+        
+        // ============================================================
+        // 新增：下载视频到本地
+        // ============================================================
+        function downloadVideo() {
+            if (!currentVideoUrl) {
+                showStatus('⚠️ 没有可下载的视频', 'error');
+                return;
+            }
+            
+            // 构建完整的视频 URL
+            const fullVideoUrl = currentVideoUrl.startsWith('http') ? currentVideoUrl : API_BASE + currentVideoUrl;
+            
+            // 创建一个隐藏的 <a> 标签触发下载
+            const link = document.createElement('a');
+            link.href = fullVideoUrl;
+            link.download = ''; // 使用服务器返回的文件名
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showStatus('✓ 视频下载已开始，请选择保存位置', 'success');
+        }
+    </script>
+</body>
+</html>
